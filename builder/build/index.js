@@ -1,9 +1,12 @@
 const esbuild = require('esbuild');
 
-module.exports = async function () {
-    let outputFiles;
+module.exports = async function (paths, externals) {
+    let outputFiles, warnings;
     try {
-        ({outputFiles} = await esbuild.build({
+        let errors;
+        const exclude = [...externals.values()].map(external => `${external.im.root}/${external.id}/*`);
+
+        ({outputFiles, errors, warnings} = await esbuild.build({
             absWorkingDir: paths.inputs,
             entryPoints: [paths.input.relative],
             logLevel: 'silent',
@@ -11,9 +14,10 @@ module.exports = async function () {
             metafile: true,
             format: 'cjs',
             write: false,
-            external: [...externals.values()],
+            external: exclude,
             treeShaking: false
         }));
+        if (errors.length) return {errors, warnings};
     }
     catch (exc) {
         return {errors: [exc.message]};
@@ -23,11 +27,11 @@ module.exports = async function () {
 
     // Transform the dependencies
     // Ex: node_modules/svelte/internal/internal.js => svelte/internal
-    let code;
-    ({code, errors} = require('./dependencies/transform')(packaged, dependencies, application));
-    if (errors?.length) return {errors};
+    // let code;
+    // ({code, errors} = require('./dependencies/transform')(packaged, dependencies, application));
+    // if (errors?.length) return {errors};
 
     // Expose as an AMD module
-    code = require('./amd')(code, externals);
-    return {code};
+    const code = require('./amd')(packaged, externals);
+    return {code, warnings};
 }

@@ -1,32 +1,4 @@
 module.exports = function (bundle, inputs, application) {
-    const externals = new Map();
-    const dependencies = new Map();
-    const root = `node_modules/${bundle}/`;
-
-    [...Object.keys(inputs)].forEach(input => {
-        if (!input.includes('node_modules/') || input.includes(root)) return;
-        const {errors, errorCode, solved} = require('../dependencies/find')(input, application);
-
-        // Who imports the input dependency
-        const importers = (() => {
-            const importers = new Set();
-            Object.entries(inputs).forEach(([importer, {imports}]) => {
-                imports = imports.map(({path}) => path);
-                imports.includes(input) && importers.add(importer);
-            });
-            return importers;
-        })();
-
-        const relative = input.split('/node_modules/')[0];
-        dependencies.set(input, {errors, errorCode, input, solved, importers});
-
-        // Add the external. If no errors were found, it means that it is an external bundle
-        if (!errors?.length) {
-            const exclude = `${relative}/node_modules/${solved}/*`;
-            !errors?.length && externals.set(solved, exclude);
-        }
-    });
-
     // Find the root package of the internal dependencies
     dependencies.forEach(dependency => {
         if (!dependency.errors?.length) {

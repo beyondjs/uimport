@@ -10,14 +10,9 @@ module.exports = async function (bundle, application, paths) {
     const metafile = new (require('./metafile'))(paths);
     await metafile.process();
 
-    const dependencies = new (require('./dependencies'))(metafile);
+    const dependencies = new (require('./dependencies'))(bundle, application, metafile.ims);
+    dependencies.process();
 
-
-    return {code: ''};
-
-    // const {inputs} = metafile;
-    // let errors, externals, dependencies;
-    // ({externals, dependencies, errors} = require('./dependencies')(bundle, inputs, application));
-    // if (errors) return {errors};
-
+    const {code, errors, warnings} = await require('./build')(paths, dependencies.externals);
+    return {code, errors, warnings};
 }
