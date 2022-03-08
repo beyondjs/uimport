@@ -1,24 +1,6 @@
 const esbuild = require('esbuild');
-const fs = require('fs').promises;
 
-module.exports = async function (bundle, application, paths) {
-    await fs.mkdir(paths.input.dirname, {recursive: true});
-    await fs.writeFile(
-        paths.input.fullpath,
-        `export * from '${bundle}';`, 'utf8'
-    );
-
-    const metafile = new (require('./metafile'))(paths);
-    await metafile.initialise();
-
-    
-    return;
-
-    const {inputs} = metafile;
-    let errors, externals, dependencies;
-    ({externals, dependencies, errors} = require('./dependencies')(bundle, inputs, application));
-    if (errors) return {errors};
-
+module.exports = async function () {
     let outputFiles;
     try {
         ({outputFiles} = await esbuild.build({

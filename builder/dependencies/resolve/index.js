@@ -1,7 +1,7 @@
 const cache = new Map();
 
 module.exports = function (pkg, subpath, application) {
-    const {errors, path, json} = require('./find')(pkg, application);
+    const {errors, path, json} = require('./resolve')(pkg, application);
     if (errors) return {errors};
 
     const key = `${pkg}//${application.id}`;

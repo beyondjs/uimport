@@ -14,20 +14,21 @@ module.exports = class {
     #paths;
     #metafile;
 
-    get inputs() {
-        return this.#metafile;
+    #ims;
+    get ims() {
+        return this.#ims;
     }
 
-    #importers;
-    get importers() {
-        return this.#importers;
-    }
-
+    /**
+     * Metafile constructor
+     *
+     * @param paths {{inputs: string, cache: string, input: {relative: string, fullpath: string, dirname: string}}}
+     */
     constructor(paths) {
         this.#paths = paths;
     }
 
-    async initialise() {
+    async process() {
         const paths = this.#paths;
 
         try {
@@ -52,6 +53,6 @@ module.exports = class {
 
         if (this.#errors.length) return;
 
-        this.#importers = new (require('./inputs'))(this.#metafile);
+        this.#ims = new (require('./ims'))(this.#metafile);
     }
 }
