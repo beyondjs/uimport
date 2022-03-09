@@ -1,5 +1,5 @@
 module.exports = function (code, externals) {
-    const ids = [...externals.keys()];
+    const ids = [...externals.values()].map(external => external.id);
 
     const required = JSON.stringify(ids);
     const dependencies = new Map(ids.map((external, index) => [external, `dep_${index}`]));

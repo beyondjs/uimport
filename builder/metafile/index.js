@@ -19,6 +19,11 @@ module.exports = class {
         return this.#ims;
     }
 
+    #roots;
+    get roots() {
+        return this.#roots;
+    }
+
     /**
      * Metafile constructor
      *
@@ -54,5 +59,10 @@ module.exports = class {
         if (this.#errors.length) return;
 
         this.#ims = new (require('./ims'))(this.#metafile);
+
+        // Roots are the im that doesn't have consumers of their own package
+        this.#roots = new Map([...this.#ims].filter(([, im]) =>
+            ![...im.consumers.values()].filter(consumer => consumer.pkg === im.pkg).length
+        ));
     }
 }

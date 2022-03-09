@@ -1,11 +1,12 @@
 const fs = require('fs').promises;
 const p = require('path');
 
+// const bundle = 'scheduler';
+const bundle = 'react-dom';
 // const bundle = 'svelte/internal';
 // const bundle = 'svelte/store';
 // const bundle = 'redux';
 // const bundle = '@babel/runtime/helpers/esm/defineProperty';
-const bundle = 'react-dom';
 // const bundle = 'react';
 // const bundle = 'swiper';
 // const bundle = 'dom7';
