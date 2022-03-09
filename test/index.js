@@ -8,7 +8,17 @@ const paths = {
 };
 
 (async () => {
+    const errors = new Map();
     for (const bundle of require('./cases')) {
-        await uimport(bundle, paths);
+        const response = await uimport(bundle, paths);
+        response.errors && errors.set(bundle, response.errors);
+    }
+
+    if (errors.size) {
+        console.log(`Errors found on ${errors.size} bundles:\n`);
+        errors.forEach((errors, bundle) => {
+            console.log(`Errors found on bundle "${bundle}":`)
+            errors.forEach(error => console.log(`\t- ${error}`));
+        });
     }
 })().catch(exc => console.error(exc.stack));
