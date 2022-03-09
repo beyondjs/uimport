@@ -6,9 +6,9 @@
     <script src="./require.min.js"></script>
     <script>
         require.config({baseUrl: 'packages'});
-        require(['vue', 'svelte/store'], (vue, svelteStore) => {
-            window.vue = vue;
-            window.svelteStore = svelteStore;
+        require(['highlight-ts'], (highlight) => {
+            console.log('window.highlight', highlight);
+            window.highlight = highlight;
         });
     </script>
 </head>

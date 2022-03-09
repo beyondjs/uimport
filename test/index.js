@@ -2,7 +2,8 @@ const uimport = require('..');
 const p = require('path');
 const fs = require('fs').promises;
 
-const cases = require('./cases');
+// const cases = require('./cases');
+const cases = new Set(['highlight-ts']);
 // const cases = new Set(['react-dom']);
 
 const paths = {
