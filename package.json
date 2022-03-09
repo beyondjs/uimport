@@ -4,8 +4,7 @@
   "repository": "https://github.com/beyondjs/uimport",
   "main": "lib",
   "files": [
-    "index.js",
-    "builder"
+    "lib"
   ],
   "dependencies": {
     "@babel/traverse": "^7.17.3",
