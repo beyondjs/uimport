@@ -1,4 +1,5 @@
 module.exports = class {
+    #application;
     #ims;
 
     // ex: '../node_modules/react/dist/react.development.js'
@@ -18,6 +19,10 @@ module.exports = class {
     #pkg;
     get pkg() {
         return this.#pkg;
+    }
+
+    get container() {
+        return this.external.error ? this.#pkg : this.external.id;
     }
 
     // ex: 'react/dist/react.development.js'
@@ -61,6 +66,12 @@ module.exports = class {
         })();
     }
 
+    #external;
+    get external() {
+        if (this.#external !== void 0) return this.#external;
+        return this.#external = new (require('./external'))(this, this.#application);
+    }
+
     /**
      * Input constructor
      *
@@ -68,13 +79,15 @@ module.exports = class {
      * @param input {string} The path of the input being constructed (ex: ../node_modules/react/dist/react.development.js)
      * @param meta {object} The esbuild metadata of the input
      * @param ims {object} The internal modules collection
+     * @param application {object} The application object
      */
-    constructor(inputs, input, meta, ims) {
+    constructor(inputs, input, meta, ims, application) {
         this.#input = input;
         this.#meta = meta;
         this.#ims = ims;
+        this.#application = application;
 
-        const [root, resource] = input.split('/node_modules/');
+        const [root, resource] = input.replace('/node_modules/', '//').split('//');
         this.#root = `${root}/node_modules`;
         this.#path = resource;
 

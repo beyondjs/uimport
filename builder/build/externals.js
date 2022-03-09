@@ -20,7 +20,7 @@ module.exports = function (code, externals) {
         CallExpression({node}) {
             if (node.callee.name !== 'require') return;
             const required = node.arguments[0];
-            externals.has(required.value) && (required.value = externals.get(required.value).id);
+            externals.has(required.value) && (required.value = externals.get(required.value).container);
         }
     });
 

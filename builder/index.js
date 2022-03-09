@@ -7,11 +7,10 @@ module.exports = async function (bundle, application, paths) {
         `export * from '${bundle}';`, 'utf8'
     );
 
-    const metafile = new (require('./metafile'))(paths);
+    const metafile = new (require('./metafile'))(bundle, application, paths);
     await metafile.process();
+    if (!metafile.valid) return {errors: metafile.errors};
 
-    const externals = new (require('./externals'))(bundle, metafile.roots, application);
-
-    const {code, errors, warnings} = await require('./build')(paths, externals);
+    const {code, errors, warnings} = await require('./build')(paths, metafile.externals);
     return {code, errors, warnings};
 }
