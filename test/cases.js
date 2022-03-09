@@ -7,6 +7,7 @@ module.exports = new class extends Set {
         this.add('scheduler');
         this.add('svelte/internal');
         this.add('svelte/store');
+        this.add('vue');
         this.add('redux');
         this.add('@babel/runtime/helpers/esm/defineProperty');
         this.add('swiper');
