@@ -2,6 +2,9 @@ const uimport = require('..');
 const p = require('path');
 const fs = require('fs').promises;
 
+const cases = require('./cases');
+// const cases = new Set(['react-dom']);
+
 const paths = {
     cwd: __dirname, // The working directory
     temp: '.uimport/temp', // Directory relative to the working directory, where uimport will create temporary files
@@ -11,7 +14,7 @@ const paths = {
 (async () => {
     const report = {errors: new Map()};
 
-    for (const bundle of require('./cases')) {
+    for (const bundle of cases) {
         console.log(`Processing bundle: "${bundle}"`);
         const {errors, code} = await uimport(bundle, paths);
         if (errors) {
