@@ -1,11 +1,15 @@
 {
   "name": "uimport",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "repository": "https://github.com/beyondjs/uimport",
   "main": "lib",
   "files": [
     "lib"
   ],
+  "exports": {
+    ".": "./lib/index.js",
+    "./packages": "./lib/packages/index.js"
+  },
   "dependencies": {
     "@babel/traverse": "^7.17.3",
     "esbuild": "^0.14.23",
