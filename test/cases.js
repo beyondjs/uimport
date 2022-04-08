@@ -21,5 +21,7 @@ module.exports = new class extends Set {
         this.add('engine.io-parser');
         this.add('yeast');
         this.add('engine.io-client');
+        this.add('framer-motion');
+        this.add('framesync');
     }
 }
