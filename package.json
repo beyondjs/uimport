@@ -11,8 +11,8 @@
     "./packages": "./lib/packages/index.js"
   },
   "dependencies": {
-    "@babel/traverse": "^7.17.3",
-    "esbuild": "^0.14.23",
+    "@babel/traverse": "^7.17.9",
+    "esbuild": "^0.14.34",
     "resolve-package-path": "^4.0.3"
   }
 }

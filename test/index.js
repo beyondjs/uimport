@@ -9,7 +9,8 @@ const fs = require('fs').promises;
 // const cases = new Set(['framer-motion']);
 // const cases = new Set(['framesync']);
 // const cases = new Set(['engine.io-parser']);
-const cases = new Set(['socket.io-client']);
+// const cases = new Set(['socket.io-client']);
+const cases = new Set(['@mui/material/button']);
 
 const paths = {
     cwd: __dirname, // The working directory
