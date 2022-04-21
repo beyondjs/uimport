@@ -5,13 +5,14 @@ const fs = require('fs').promises;
 
 // const cases = require('./cases');
 // const cases = new Set(['highlight-ts']);
-// const cases = new Set(['react-dom']);
+// const cases = new Set(['react']);
+const cases = new Set(['react-dom']);
 // const cases = new Set(['framer-motion']);
 // const cases = new Set(['framesync']);
 // const cases = new Set(['engine.io-parser']);
 // const cases = new Set(['socket.io-client']);
 // const cases = new Set(['@mui/utils']);
-const cases = new Set(['@mui/material/button']);
+// const cases = new Set(['@mui/material/button']);
 
 const paths = {
     cwd: __dirname, // The working directory
@@ -26,7 +27,7 @@ const paths = {
         console.log(`Processing bundle: "${bundle}"`);
         const {errors, code} = await uimport(bundle, paths);
         if (errors) {
-            console.log(`\tErrors found on bundle "${bundle}"`.red)
+            console.log(`Errors found on bundle "${bundle}"`.red)
             report.errors.set(bundle, errors);
             continue;
         }
