@@ -11,8 +11,9 @@
     "./packages": "./lib/packages/index.js"
   },
   "dependencies": {
+    "esbuild": "^0.14.47",
     "@babel/traverse": "^7.17.9",
-    "esbuild": "^0.14.34",
-    "resolve-package-path": "^4.0.3"
+    "resolve-package-path": "^4.0.3",
+    "cjs-module-lexer": "^1.2.2"
   }
 }
