@@ -3,11 +3,12 @@ const uimport = require('..');
 const p = require('path');
 const fs = require('fs').promises;
 
-// const cases = require('./cases');
+const cases = require('./cases');
 // const cases = new Set(['svelte/store']);
 // const cases = new Set(['highlight-ts']);
-const cases = new Set(['svelte/store', 'react-dom']);
+// const cases = new Set(['svelte/store', 'react-dom']);
 // const cases = new Set(['d3']);
+// const cases = new Set(['vue']);
 // const cases = new Set(['framer-motion']);
 // const cases = new Set(['framesync']);
 // const cases = new Set(['engine.io-parser']);
