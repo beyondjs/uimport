@@ -17,7 +17,7 @@ const cases = new Set(['react']);
 
 const paths = {
     cwd: __dirname, // The working directory
-    temp: '.uimport/temp', // Directory relative to the working directory, where uimport will create temporary files
+    temp: p.join(__dirname, '.uimport/temp'),
     cache: p.join(__dirname, '.uimport/cache')
 };
 
@@ -26,7 +26,7 @@ const paths = {
 
     for (const bundle of cases) {
         console.log(`Processing bundle: "${bundle}"`);
-        const {errors, code} = await uimport(bundle, paths);
+        const {errors, code} = await uimport(bundle, 'esm', paths);
         if (errors) {
             console.log(`Errors found on bundle "${bundle}"`.red)
             report.errors.set(bundle, errors);
