@@ -26,7 +26,7 @@ const paths = {
 
     for (const bundle of cases) {
         console.log(`Processing bundle: "${bundle}"`);
-        const {errors, code, version} = await uimport(bundle, 'amd', paths);
+        const {errors, code, version, dependencies} = await uimport(bundle, 'amd', paths);
         if (errors) {
             console.log(`Errors found on bundle "${bundle}"`.red)
             report.errors.set(bundle, errors);
@@ -37,6 +37,7 @@ const paths = {
         await fs.mkdir(p.dirname(target), {recursive: true});
         await fs.writeFile(target, code, 'utf8');
         console.log(`\tBundle: "${bundle}" saved`);
+        dependencies.length && console.log('\tDependencies:', dependencies.map(({id}) => id));
     }
 
     console.log('\n---\n');
