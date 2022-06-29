@@ -23,21 +23,34 @@ const paths = {
 
 (async () => {
     const report = {errors: new Map()};
+    const generated = new Set();
 
-    for (const bundle of cases) {
+    const build = async (bundle) => {
+        if (generated.has(bundle)) return; // Bundle already generated
+
         console.log(`Processing bundle: "${bundle}"`);
+        generated.add(bundle);
         const {errors, code, version, dependencies} = await uimport(bundle, 'amd', paths);
         if (errors) {
             console.log(`Errors found on bundle "${bundle}"`.red)
             report.errors.set(bundle, errors);
-            continue;
+            return;
         }
 
-        const target = p.join(__dirname, 'html/packages', `${bundle}@${version}.js`);
+        const file = bundle.includes('@') ? `${bundle}.js` : `${bundle}@${version}.js`;
+        const target = p.join(__dirname, 'html/packages', file);
         await fs.mkdir(p.dirname(target), {recursive: true});
         await fs.writeFile(target, code, 'utf8');
         console.log(`\tBundle: "${bundle}" saved`);
+
         dependencies.length && console.log('\tDependencies:', dependencies.map(({id}) => id));
+        for (const {id} of dependencies) {
+            await build(id);
+        }
+    }
+
+    for (const bundle of cases) {
+        await build(bundle);
     }
 
     console.log('\n---\n');
