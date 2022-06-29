@@ -6,7 +6,7 @@ const fs = require('fs').promises;
 // const cases = require('./cases');
 // const cases = new Set(['svelte/store']);
 // const cases = new Set(['highlight-ts']);
-const cases = new Set(['react']);
+const cases = new Set(['react', 'react-dom']);
 // const cases = new Set(['d3']);
 // const cases = new Set(['framer-motion']);
 // const cases = new Set(['framesync']);
@@ -26,14 +26,14 @@ const paths = {
 
     for (const bundle of cases) {
         console.log(`Processing bundle: "${bundle}"`);
-        const {errors, code} = await uimport(bundle, 'esm', paths);
+        const {errors, code, version} = await uimport(bundle, 'amd', paths);
         if (errors) {
             console.log(`Errors found on bundle "${bundle}"`.red)
             report.errors.set(bundle, errors);
             continue;
         }
 
-        const target = p.join(__dirname, 'html/packages', `${bundle}.js`);
+        const target = p.join(__dirname, 'html/packages', `${bundle}@${version}.js`);
         await fs.mkdir(p.dirname(target), {recursive: true});
         await fs.writeFile(target, code, 'utf8');
         console.log(`\tBundle: "${bundle}" saved`);
