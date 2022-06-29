@@ -20,6 +20,7 @@ const paths = {
     temp: p.join(__dirname, '.uimport/temp'),
     cache: p.join(__dirname, '.uimport/cache')
 };
+const mode = 'esm';
 
 (async () => {
     const report = {errors: new Map()};
@@ -30,7 +31,7 @@ const paths = {
 
         console.log(`Processing bundle: "${bundle}"`);
         generated.add(bundle);
-        const {errors, code, version, dependencies} = await uimport(bundle, 'amd', paths);
+        const {errors, code, version, dependencies} = await uimport(bundle, mode, paths);
         if (errors) {
             console.log(`Errors found on bundle "${bundle}"`.red)
             report.errors.set(bundle, errors);
