@@ -3,16 +3,19 @@ const uimport = require('..');
 const p = require('path');
 const fs = require('fs').promises;
 
-const cases = require('./cases');
+// const cases = require('./cases');
+// const cases = new Set(['@babel/runtime/helpers/esm/defineProperty@7.17.2']);
+// const cases = new Set(['redux']);
 // const cases = new Set(['svelte/store']);
 // const cases = new Set(['highlight-ts']);
 // const cases = new Set(['svelte/store', 'react-dom']);
 // const cases = new Set(['d3']);
 // const cases = new Set(['vue']);
-// const cases = new Set(['framer-motion']);
+const cases = new Set(['framer-motion']);
 // const cases = new Set(['framesync']);
-// const cases = new Set(['engine.io-parser']);
 // const cases = new Set(['socket.io-client']);
+// const cases = new Set(['socket.io-parser']);
+// const cases = new Set(['engine.io-parser']);
 // const cases = new Set(['@mui/utils']);
 // const cases = new Set(['@mui/material/button']);
 
