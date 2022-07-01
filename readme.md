@@ -47,6 +47,16 @@ const {code, errors, warnings, dependencies} = await uimport(bundle, mode, specs
 interface specs {
     cwd?: string,   // The working directory where the local NPM modules are installed
     temp?: string,  // A required folder to save temporary files. Default: join(cwd, '.uimport/temp')
-    cache?: string  // Bundles are saved in cache. Default: join(cwd, '.uimport/cache'); 
+    cache?: string, // Bundles are saved in cache. Default: join(cwd, '.uimport/cache');
+    dependencies?: boolean // Build the dependencies of the bundle
+}
+```
+
+```typescript
+interface output {
+    code: string,
+    errors?: string[],
+    warnings?: string[],
+    dependencies?: string[]
 }
 ```
