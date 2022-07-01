@@ -5,7 +5,7 @@
 Import them in any ESM environment (browser, Node.js v14+, Deno).
 
 ```javascript
-// Consume react (as any other package) directlly from the browser and deno as ES module
+// Consume react (as any other package) directlly from the browser and deno as ES modules.
 import {useState} from 'react';
 ```
 
@@ -14,6 +14,21 @@ import {useState} from 'react';
 ```bash
 npm install -g uimport
 ```
+
+## Local server
+
+You can consume the bundles through a local server by running:
+
+```bash
+uimport server --port=8080 --cwd=working_directory
+```
+
+![Deno consuming react as a local package](./readme/deno.png "Deno consuming react as a local package").
+
+## API
+
+UImport will look into the node_modules folder to find the package to be bundled. You can optionally specify the current
+working directory where node_modules resides.
 
 ```javascript
 const uimport = require('uimport');
@@ -35,10 +50,3 @@ interface specs {
     cache?: string  // Bundles are saved in cache. Default: join(cwd, '.uimport/cache'); 
 }
 ```
-
-# Local server
-
-# Features
-
-# API
-
