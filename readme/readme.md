@@ -174,6 +174,6 @@ in each project.
 # Feedback and collaboration
 
 * If you know of an alternative solution to `uimport`, please let us know.
-* If `uimport` is useful to you, maybe you can collaborate with us.
+* If `uimport` is useful to you, maybe you can collaborate with us to join efforts.
 
 > [hello@beyondjs.com](mailto:hello@beyondjs.com). 
