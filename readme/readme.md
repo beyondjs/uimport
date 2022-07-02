@@ -4,15 +4,17 @@
 
 Import them in any ESM environment (browser, Node.js v14+, Deno, etc).
 
-```javascript
-import {useState} from 'react';
-```
+![Consuming react as a local package](example.png "Consuming react as a local package").
 
 # How it works
 
 ```bash
 npm install -g uimport
 ```
+
+* UImport uses [esbuild](https://esbuild.github.io/api/#build-api) to generate the pre-packaged version of the bundle,
+  and to obtain the metafile information of the package/subpath required to analyze the dependencies, esbuild is written
+  in Go and it performs 10-100x faster than other bundlers written in javascript.
 
 * UImport does not install the packages, but instead requires the packages to be installed in the working directory
   before calling it.
@@ -38,12 +40,12 @@ import 'svelte/internal';
 import 'svelte/store';
 ````
 
+When uimport generates a bundle, and finds a dependency on a subpath of a package that does not specify the .exports
+property, then uimport will not split the code, but rather include the code in the requested bundle.
+
 Unfortunately, there is a wide variety of packages that do not follow such specific criteria. Many of them were created
 before the .exports property of package.json existed, and were generally intended to work with bundlers like webpack,
 and not to be consumed directly from a browser or deno.
-
-When uimport generates a bundle, and finds a dependency on a subpath of a package that does not specify the .exports
-property, then uimport will not split the code, but rather include the code in the requested bundle.
 
 ## Local server
 
@@ -53,7 +55,7 @@ Your application can consume the bundles through a local server provided by uimp
 uimport server --port=8080 --cwd=working_directory
 ```
 
-### Resource URLs
+### Resources URLs
 
 #### Load the package at the version specified in the package.json.
 
@@ -68,8 +70,6 @@ We recommend importing packages by specifying their version.
 ```javascript
 import 'http://localhost:port/package_name@version.js';
 ```
-
-![Deno consuming react as a local package](deno.png "Deno consuming react as a local package").
 
 Although an application directly uses a specific version of a package, each of them in turn has its own dependencies
 with versions that can be different.
