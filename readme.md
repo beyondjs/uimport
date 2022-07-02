@@ -4,7 +4,7 @@
 
 Import them in any ESM environment (browser, Node.js v14+, Deno, etc).
 
-![Consuming react as a local package](example.png "Consuming react as a local package").
+![Consuming react as a local package](./readme/example.png "Consuming react as a local package").
 
 # How it works
 
