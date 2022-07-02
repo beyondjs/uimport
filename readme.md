@@ -58,7 +58,7 @@ uimport server --port=8080 --cwd=working_directory
 #### Load the package at the version specified in the package.json.
 
 ```javascript
-import 'http://localhost:port/package_name';
+import 'http://localhost:port/package_name.js';
 ````
 
 #### Load the exact version of the package
@@ -66,7 +66,7 @@ import 'http://localhost:port/package_name';
 We recommend importing packages by specifying their version.
 
 ```javascript
-import 'http://localhost:port/package_name@version'
+import 'http://localhost:port/package_name@version.js';
 ```
 
 ![Deno consuming react as a local package](./readme/deno.png "Deno consuming react as a local package").

@@ -1,19 +1,33 @@
 {
   "name": "uimport",
   "version": "1.0.6",
+  "author": "The BeyondJS team",
+  "description": "Convert NPM packages (ex: react, vue, d3, ...) into fresh ESM, locally!",
   "repository": "https://github.com/beyondjs/uimport",
   "main": "lib",
   "files": [
     "lib"
   ],
+  "bin": {
+    "uimport": "./bin/server.js"
+  },
   "exports": {
     ".": "./lib/index.js",
-    "./packages": "./lib/packages/index.js"
+    "./packages": "./lib/packages/index.js",
+    "./server": "./lib/server/index.js"
   },
   "dependencies": {
-    "esbuild": "0.14.25",
     "@babel/traverse": "^7.17.9",
+    "cjs-module-lexer": "^1.2.2",
+    "colors": "^1.4.0",
+    "esbuild": "0.14.25",
     "resolve-package-path": "^4.0.3",
-    "cjs-module-lexer": "^1.2.2"
-  }
+    "yargs": "^17.5.1"
+  },
+  "keywords": [
+    "packaging",
+    "unbundled development",
+    "esm",
+    "npm to esm"
+  ]
 }
