@@ -69,7 +69,7 @@ We recommend importing packages by specifying their version.
 import 'http://localhost:port/package_name@version.js';
 ```
 
-![Deno consuming react as a local package](./readme/deno.png "Deno consuming react as a local package").
+![Deno consuming react as a local package](deno.png "Deno consuming react as a local package").
 
 Although an application directly uses a specific version of a package, each of them in turn has its own dependencies
 with versions that can be different.

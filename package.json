@@ -6,8 +6,11 @@
   "repository": "https://github.com/beyondjs/uimport",
   "main": "lib",
   "files": [
-    "lib"
+    "lib",
+    "bin",
+    "readme"
   ],
+  "readme": "readme/readme.md",
   "bin": {
     "uimport": "./bin/server.js"
   },
