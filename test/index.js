@@ -4,7 +4,7 @@ const p = require('path');
 const fs = require('fs').promises;
 
 const cases = require('./cases');
-// const cases = new Set(['@babel/runtime/helpers/esm/defineProperty@7.17.2']);
+// const cases = new Set(['svelte@3.46.4/store']);
 // const cases = new Set(['redux']);
 // const cases = new Set(['svelte/store']);
 // const cases = new Set(['highlight-ts']);
@@ -38,6 +38,7 @@ const mode = 'esm';
         console.log(`Processing bundle: "${bundle}"`);
         generated.add(bundle);
         const {errors, code, version, dependencies} = await uimport(bundle, mode, paths);
+
         if (errors) {
             console.log(`Errors found on bundle "${bundle}"`.red)
             report.errors.set(bundle, errors);

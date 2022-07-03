@@ -61,6 +61,7 @@ uimport server --port=8080 --cwd=working_directory
 
 ```javascript
 import 'http://localhost:port/package_name.js';
+import 'http://localhost:port/package_name/subpath.js';
 ````
 
 #### Load the exact version of the package
@@ -69,10 +70,11 @@ We recommend importing packages by specifying their version.
 
 ```javascript
 import 'http://localhost:port/package_name@version.js';
+import 'http://localhost:port/package_name@version/subpath.js';
 ```
 
-Although an application directly uses a specific version of a package, each of them in turn has its own dependencies
-with versions that can be different.
+Although an application uses a specific version of a package (according to what is specified in the package.json of your
+app), the packages have in turn its own dependencies and there could be version conflict among packages.
 
 UImport generates by default the dependencies of the packages according to the version that each of them requires. This
 way, if your app specified a dependency (ex: dep_a@2.0.0) in the package.json, but then another dependency requires
@@ -101,7 +103,7 @@ interface specs {
     cwd?: string,   // The working directory where the local NPM modules are installed
     temp?: string,  // A required folder to save temporary files. Default: join(cwd, '.uimport/temp')
     cache?: string, // Bundles are saved in cache. Default: join(cwd, '.uimport/cache');
-    dependencies?: boolean // Build the dependencies of the bundle
+    dependencies?: boolean // Build the dependencies of the bundle or not
 }
 ```
 
