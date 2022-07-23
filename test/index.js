@@ -3,10 +3,11 @@ const uimport = require('..');
 const p = require('path');
 const fs = require('fs').promises;
 
-const cases = require('./cases');
+// const cases = require('./cases');
+// const cases = new Set(['cheerio@1.0.0-rc.12']);
 // const cases = new Set(['svelte@3.46.4/store']);
 // const cases = new Set(['redux']);
-// const cases = new Set(['svelte/store']);
+const cases = new Set(['svelte/store']);
 // const cases = new Set(['highlight-ts']);
 // const cases = new Set(['svelte/store', 'react-dom']);
 // const cases = new Set(['d3']);
@@ -26,7 +27,7 @@ const paths = {
     temp: p.join(__dirname, '.uimport/temp'),
     cache: p.join(__dirname, '.uimport/cache')
 };
-const mode = 'esm';
+const mode = 'sjs';
 
 (async () => {
     const report = {errors: new Map()};

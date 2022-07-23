@@ -92,7 +92,7 @@ const {code, errors, warnings, dependencies} = await uimport(bundle);
 ```
 
 ```javascript
-// mode can be 'esm' or 'amd'
+// mode can be 'esm', 'sjs', or 'amd'
 const {code, errors, warnings, dependencies} = await uimport(bundle, mode, specs);
 ```
 
