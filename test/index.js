@@ -7,9 +7,10 @@ const fs = require('fs').promises;
 // const cases = new Set(['cheerio@1.0.0-rc.12']);
 // const cases = new Set(['svelte@3.46.4/store']);
 // const cases = new Set(['redux']);
-const cases = new Set(['svelte/store']);
+// const cases = new Set(['svelte/store']);
 // const cases = new Set(['highlight-ts']);
 // const cases = new Set(['svelte/store', 'react-dom']);
+const cases = new Set(['react-dom']);
 // const cases = new Set(['d3']);
 // const cases = new Set(['vue']);
 // const cases = new Set(['framer-motion']);
@@ -27,18 +28,17 @@ const paths = {
     temp: p.join(__dirname, '.uimport/temp'),
     cache: p.join(__dirname, '.uimport/cache')
 };
-const mode = 'sjs';
+const modes = ['sjs'];
 
 (async () => {
     const report = {errors: new Map()};
     const generated = new Set();
 
-    const build = async (bundle) => {
+    const build = async (bundle, mode) => {
         if (generated.has(bundle)) return; // Bundle already generated
 
         console.log(`Processing bundle: "${bundle}"`);
-        generated.add(bundle);
-        const {errors, code, version, dependencies} = await uimport(bundle, mode, paths);
+        const {errors, code, pkg, subpath, version, dependencies} = await uimport(bundle, mode, paths);
 
         if (errors) {
             console.log(`Errors found on bundle "${bundle}"`.red)
@@ -46,7 +46,7 @@ const mode = 'sjs';
             return;
         }
 
-        const file = bundle.includes('@') ? `${bundle}.js` : `${bundle}@${version}.js`;
+        const file = `${mode}/${pkg.name}@${version}` + (subpath ? `/${subpath.slice(2)}.js` : '.js');
         const target = p.join(__dirname, 'html/packages', file);
         await fs.mkdir(p.dirname(target), {recursive: true});
         await fs.writeFile(target, code, 'utf8');
@@ -54,12 +54,16 @@ const mode = 'sjs';
 
         dependencies.length && console.log('\tDependencies:', dependencies.map(({id}) => id));
         for (const {id} of dependencies) {
-            await build(id);
+            for (const mode of modes) {
+                await build(id, mode);
+            }
         }
     }
 
     for (const bundle of cases) {
-        await build(bundle);
+        for (const mode of modes) {
+            await build(bundle, mode);
+        }
     }
 
     console.log('\n---\n');
