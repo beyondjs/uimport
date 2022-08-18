@@ -28,7 +28,7 @@ const paths = {
     temp: p.join(__dirname, '.uimport/temp'),
     cache: p.join(__dirname, '.uimport/cache')
 };
-const modes = ['sjs'];
+const modes = ['sjs', 'amd', 'esm'];
 
 (async () => {
     const report = {errors: new Map()};
