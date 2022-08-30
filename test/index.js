@@ -24,10 +24,12 @@ const cases = new Set(['engine.io-client']);
 // const cases = new Set(['@mui/utils']);
 // const cases = new Set(['@mui/material/button']);
 
-const paths = {
+const UISpecs = {
     cwd: __dirname, // The working directory
     temp: p.join(__dirname, '.uimport/temp'),
-    cache: p.join(__dirname, '.uimport/cache')
+    cache: p.join(__dirname, '.uimport/cache'),
+    versions: true,
+    previousPath: true,
 };
 const modes = ['sjs', 'amd', 'esm'];
 
@@ -39,7 +41,7 @@ const modes = ['sjs', 'amd', 'esm'];
         if (generated.has(bundle)) return; // Bundle already generated
 
         console.log(`Processing bundle: "${bundle}"`);
-        const {errors, code, pkg, subpath, version, dependencies} = await uimport(bundle, mode, paths);
+        const {errors, code, pkg, subpath, version, dependencies} = await uimport(bundle, mode, UISpecs);
 
         if (errors) {
             console.log(`Errors found on bundle "${bundle}"`.red)
