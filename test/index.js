@@ -20,16 +20,17 @@ const fs = require('fs').promises;
 // const cases = new Set(['socket.io-client']);
 // const cases = new Set(['socket.io-parser']);
 // const cases = new Set(['engine.io-parser']);
-const cases = new Set(['engine.io-client']);
+// const cases = new Set(['engine.io-client']);
 // const cases = new Set(['@mui/utils']);
 // const cases = new Set(['@mui/material/button']);
+const cases = new Set(['@beyond-js/kernel/core']);
 
 const UISpecs = {
     cwd: __dirname, // The working directory
     temp: p.join(__dirname, '.uimport/temp'),
     cache: p.join(__dirname, '.uimport/cache'),
     versions: true,
-    previousPath: true,
+    // prePath: 'packages'
 };
 const modes = ['sjs', 'amd', 'esm'];
 
@@ -49,7 +50,7 @@ const modes = ['sjs', 'amd', 'esm'];
             return;
         }
 
-        const file = `${mode}/${pkg.name}@${version}` + (subpath ? `/${subpath.slice(2)}.js` : '.js');
+        const file = `${mode}/${pkg.name}${version ? `@${version}` : ''}` + (subpath ? `/${subpath.slice(2)}.js` : '.js');
         const target = p.join(__dirname, 'html/packages', file);
         await fs.mkdir(p.dirname(target), {recursive: true});
         await fs.writeFile(target, code, 'utf8');
