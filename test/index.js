@@ -17,12 +17,12 @@ const fs = require('fs').promises;
 // const cases = new Set(['tslib']);
 // const cases = new Set(['framesync']);
 // const cases = new Set(['firebase/app']);
+// const cases = new Set(['@mui/utils']);
+// const cases = new Set(['@mui/material/button']);
 // const cases = new Set(['socket.io-client']);
 // const cases = new Set(['socket.io-parser']);
 // const cases = new Set(['engine.io-parser']);
 // const cases = new Set(['engine.io-client']);
-// const cases = new Set(['@mui/utils']);
-// const cases = new Set(['@mui/material/button']);
 const cases = new Set(['@beyond-js/kernel/core']);
 
 const UISpecs = {
