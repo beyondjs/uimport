@@ -22,8 +22,9 @@ const fs = require('fs').promises;
 // const cases = new Set(['socket.io-client']);
 // const cases = new Set(['socket.io-parser']);
 // const cases = new Set(['engine.io-parser']);
-// const cases = new Set(['engine.io-client']);
-const cases = new Set(['@beyond-js/kernel/core']);
+const cases = new Set(['engine.io-client']);
+// const cases = new Set(['@beyond-js/kernel/core']);
+// const cases = new Set(['@beyond-js/widgets/layout']);
 
 const UISpecs = {
     cwd: __dirname, // The working directory
