@@ -10,7 +10,7 @@ const fs = require('fs').promises;
 // const cases = new Set(['svelte/store']);
 // const cases = new Set(['highlight-ts']);
 // const cases = new Set(['svelte/store', 'react-dom']);
-// const cases = new Set(['react-dom']);
+const cases = new Set(['react-dom']);
 // const cases = new Set(['d3']);
 // const cases = new Set(['vue']);
 // const cases = new Set(['framer-motion']);
@@ -22,7 +22,7 @@ const fs = require('fs').promises;
 // const cases = new Set(['socket.io-client']);
 // const cases = new Set(['socket.io-parser']);
 // const cases = new Set(['engine.io-parser']);
-const cases = new Set(['engine.io-client']);
+// const cases = new Set(['engine.io-client']);
 // const cases = new Set(['@beyond-js/kernel/core']);
 // const cases = new Set(['@beyond-js/widgets/layout']);
 
