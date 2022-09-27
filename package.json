@@ -16,8 +16,9 @@
   },
   "exports": {
     ".": "./lib/index.js",
+    "./utils": "./lib/utils",
+    "./registry": "./lib/registry/index.js",
     "./dependencies": "./lib/dependencies/index.js",
-    "./dependencies/packages": "./lib/dependencies/packages/index.js",
     "./downloader": "./lib/downloader/index.js",
     "./packages": "./lib/packages/index.js",
     "./server": "./lib/server/index.js"

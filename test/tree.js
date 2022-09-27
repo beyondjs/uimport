@@ -1,5 +1,5 @@
 const path = require('path');
-const Packages = require('uimport/dependencies/packages');
+const Registry = require('uimport/registry');
 const Dependencies = require('uimport/dependencies');
 
 /**
@@ -10,10 +10,10 @@ const specs = (() => {
     const cache = path.join(__dirname, './.uimport/registry');
     return {cache};
 })();
-const packages = new Packages(specs);
+const registry = new Registry(specs);
 
 const dependencies = new Map([['react-dom', '~18.2']]);
-const tree = new Dependencies(dependencies, packages);
+const tree = new Dependencies(dependencies, registry);
 
 (async () => {
     await tree.analyze();
