@@ -8,7 +8,7 @@ const Downloader = require('uimport/downloader');
         return new Registry({cache});
     })();
 
-    const pkg = registry.get('react-dom');
+    const pkg = registry.obtain('react-dom');
     await pkg.fetch();
     const vpackage = pkg.version('18.2.0');
 
@@ -17,6 +17,6 @@ const Downloader = require('uimport/downloader');
         return new Downloader(vpackage, {cache});
     })();
 
-    await downloader.fetch();
+    await downloader.process();
     console.log('Package version downloaded');
 })().catch(exc => console.log(exc.stack));

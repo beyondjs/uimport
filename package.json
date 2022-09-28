@@ -16,7 +16,7 @@
   },
   "exports": {
     ".": "./lib/index.js",
-    "./utils": "./lib/utils",
+    "./utils": "./lib/utils/index.js",
     "./registry": "./lib/registry/index.js",
     "./dependencies": "./lib/dependencies/index.js",
     "./downloader": "./lib/downloader/index.js",
@@ -32,7 +32,9 @@
     "colors": "^1.4.0",
     "esbuild": "0.14.25",
     "resolve-package-path": "^4.0.3",
-    "yargs": "^17.5.1"
+    "yargs": "^17.5.1",
+    "zlib": "^1.0.5",
+    "tar-stream": "^2.2.0"
   },
   "keywords": [
     "packaging",
