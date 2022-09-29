@@ -11,5 +11,6 @@ const Builder = require('uimport/builder');
     })();
 
     const builder = new Builder('react-dom', '18.2.0', specs);
-    await builder.process();
+    const {errors} = await builder.process();
+    errors && console.log('Errors found', errors);
 })().catch(exc => console.log(exc.stack));
