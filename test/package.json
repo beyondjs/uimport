@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@beyond-js/kernel": "^0.0.22",
+    "@beyond-js/widgets": "^0.0.10",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@mui/material": "^5.6.1",
