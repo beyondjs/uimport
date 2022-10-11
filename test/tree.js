@@ -1,6 +1,6 @@
 const path = require('path');
 const Registry = require('uimport/registry');
-const Dependencies = require('uimport/dependencies');
+const Dependencies = require('uimport/dependencies-tree');
 
 /**
  * Packages specification
@@ -12,7 +12,7 @@ const specs = (() => {
 })();
 const registry = new Registry(specs);
 
-const dependencies = new Map([['react-dom', '~18.2']]);
+const dependencies = new Map([['react-dom', {version: '~18.2', kind: 'main'}]]);
 const tree = new Dependencies(dependencies, registry);
 
 (async () => {
