@@ -1,2 +1,2 @@
-require('./react-dom');
+require('./build');
 // require('./download');

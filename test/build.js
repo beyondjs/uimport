@@ -1,6 +1,8 @@
 const path = require('path');
 const Builder = require('uimport/builder');
 
+const rq = {pkg: 'react-dom', version: '18.2.0', subpath: '.'};
+
 (async () => {
     // Create the client registry instance
     const specs = (() => {
@@ -11,7 +13,6 @@ const Builder = require('uimport/builder');
         return specs;
     })();
 
-    const rq = {pkg: 'react-dom', version: '18.2.0', subpath: '.'}
     const vspecifier = `${rq.pkg}@${rq.version}` + (rq.subpath === '.' ? '' : `/${rq.subpath}`);
 
     console.log(`Building package "${vspecifier}" ...`);
