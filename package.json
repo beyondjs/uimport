@@ -18,7 +18,7 @@
     ".": "./lib/index.js",
     "./utils": "./lib/utils/index.js",
     "./registry": "./lib/registry/index.js",
-    "./dependencies-tree": "./lib/dependencies/index.js",
+    "./dependencies-tree": "./lib/dependencies-tree/index.js",
     "./builder": "./lib/builder/index.js",
     "./downloader": "./lib/downloader/index.js",
     "./server": "./lib/server/index.js"
