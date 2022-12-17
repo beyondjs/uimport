@@ -1,5 +1,5 @@
 const {entities: {VPackage: VPackageStore}} = require('#store');
-const {DependenciesConfig} = require('../../dependencies-tree');
+const DependenciesConfig = require('../../dependencies-tree/config');
 const Exports = require('./exports');
 const PendingPromise = require('@beyond-js/pending-promise');
 
@@ -64,7 +64,7 @@ module.exports = class {
 
         if (!this.#version) throw new Error('Package version number must be specified');
 
-        this.#store = new VPackageStore(pkg, version);
+        this.#store = new VPackageStore(pkg.name, version);
     }
 
     #set(json) {
@@ -138,6 +138,6 @@ module.exports = class {
 
     async save() {
         if (!this.#loaded) throw new Error(`Version object cannot be saved because it hasn't be set`);
-        return await this.#store.save(this.toJSON());
+        return await this.#store.set(this.toJSON());
     }
 }

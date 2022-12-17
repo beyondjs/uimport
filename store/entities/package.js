@@ -8,6 +8,7 @@ module.exports = class {
         return this.#name;
     }
 
+    #dirname;
     #path;
 
     #value;
@@ -19,7 +20,8 @@ module.exports = class {
 
     constructor(name) {
         this.#name = name;
-        this.#path = join(cwd, '.beyond', 'registry', name, 'package.json');
+        this.#dirname = join(cwd, '.beyond/registry', name);
+        this.#path = join(this.#dirname, 'package.json');
     }
 
     async load() {
@@ -36,6 +38,7 @@ module.exports = class {
         !this.#read && await this.load();
         const value = this.#value ? this.#value : {};
 
+        await fs.mkdir(this.#dirname, {recursive: true});
         const content = JSON.stringify(Object.assign(value, data));
         await fs.writeFile(this.#path, content);
     }

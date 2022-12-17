@@ -22,12 +22,13 @@ module.exports = function (root, done) {
         })();
 
         const file = new PackageFile(target);
-        const writer = file.createWriteStream();
-        writer.on('error', error => done({error}));
-        writer.on('finish', next);
-        reader.pipe(writer);
+        file.createWriteStream().then((writer) => {
+            writer.on('error', error => done({error}));
+            writer.on('finish', next);
+            reader.pipe(writer);
 
-        reader.resume();
+            reader.resume();
+        });
     });
     extract.on('finish', () => done({files}));
 

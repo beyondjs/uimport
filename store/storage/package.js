@@ -1,9 +1,10 @@
-const {join} = require('path');
+const {join, dirname} = require('path');
 const cwd = process.cwd();
 const {createWriteStream} = require('fs');
 const fs = require('fs').promises;
 
 module.exports = class {
+    #dirname;
     #path;
 
     #error;
@@ -21,10 +22,12 @@ module.exports = class {
     }
 
     constructor(path) {
-        this.#path = join(cwd, 'packages', path);
+        this.#path = join(cwd, '.beyond/packages', path);
+        this.#dirname = dirname(this.#path);
     }
 
-    createWriteStream() {
+    async createWriteStream() {
+        await fs.mkdir(this.#dirname, {recursive: true});
         return createWriteStream(this.#path);
     }
 

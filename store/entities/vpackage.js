@@ -13,6 +13,7 @@ module.exports = class {
         return this.#version;
     }
 
+    #dirname;
     #path;
 
     #value;
@@ -23,9 +24,12 @@ module.exports = class {
     #read;
 
     constructor(pkg, version) {
+        if (!pkg || !version) throw new Error('Invalid parameters');
+
         this.#pkg = pkg;
         this.#version = version;
-        this.#path = join(cwd, '.beyond', 'registry', pkg, `${version}.json`);
+        this.#dirname = join(cwd, '.beyond', 'registry', pkg, 'versions');
+        this.#path = join(this.#dirname, `${version}.json`);
     }
 
     async load() {
@@ -43,6 +47,7 @@ module.exports = class {
         const value = this.#value ? this.#value : {};
         this.#value = Object.assign(value, data);
 
+        await fs.mkdir(this.#dirname, {recursive: true});
         const content = JSON.stringify(this.#value);
         await fs.writeFile(this.#path, content);
     }

@@ -169,8 +169,9 @@ module.exports = class {
     }
 
     async save() {
+        await this.#versions.save();
+
         const json = this.toJSON();
         await this.#store.set(json);
-        await this.#versions.save();
     }
 }

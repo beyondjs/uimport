@@ -1,5 +1,6 @@
 const {join} = require('path');
-const packages = require('@beyond-js/uimport/packages-registry');
+const {DependenciesTree} = require('@beyond-js/uimport/dependencies-tree');
+const packages = require('@beyond-js/uimport/packages-content');
 
 module.exports = class {
     #cwd;
@@ -19,6 +20,13 @@ module.exports = class {
             return;
         }
 
-        console.log(json);
+        const dependencies = new DependenciesTree({json});
+        await dependencies.process({load: true});
+
+        for (const {pkg, version} of dependencies.list.values()) {
+            console.log(`… ${pkg}@${version}`);
+            const vpackage = packages.get(pkg, version);
+            await vpackage.process();
+        }
     }
 }

@@ -62,11 +62,16 @@ module.exports = class extends Map {
     constructor({application, pkg, version, json}) {
         super();
 
+        if (json?.name && json?.version) {
+            pkg = json.name;
+            version = json.version;
+        }
+
         if (!application && (!pkg || !version)) {
-            throw new Error('Id parameter or pkg and version must be specified');
+            throw new Error('Application parameter or pkg and version must be specified');
         }
         if (application && (pkg || version)) {
-            throw new Error('Invalid parameters, pkg and version must be specified (not both) when id is set');
+            throw new Error('Invalid parameters, pkg/version should not be specified when application is set');
         }
 
         this.#application = application;
@@ -117,7 +122,9 @@ module.exports = class extends Map {
 
     async process(specs) {
         specs = specs ? specs : {};
-        if (!this.#config) throw new Error('Dependencies cannot be processed if json is not specified');
+        if (!this.#config) {
+            throw new Error('Dependencies cannot be processed if its json configuration is not specified');
+        }
 
         specs.load = specs.load === void 0 ? true : specs.load;
         specs.load && await this.load();
