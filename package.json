@@ -1,7 +1,19 @@
 {
   "private": true,
-  "name": "@beyond-js/cloud-functions",
-  "repository": "https://github.com/beyondjs/cloud-functions",
+  "name": "@beyond-js/uimport",
+  "version": "0.0.1",
+  "repository": "https://github.com/beyondjs/uimport",
+  "files": [
+    "dependencies-tree",
+    "packager",
+    "packages-content",
+    "packages-registry",
+    "router",
+    "store"
+  ],
+  "bin": {
+    "uimport": "bin/index.js"
+  },
   "dependencies": {
     "esbuild": "^0.16.1",
     "@beyond-js/crc32": "^0.0.1",
@@ -9,19 +21,27 @@
     "@beyond-js/specifier-parser": "^0.0.2",
     "@beyond-js/pending-promise": "^0.0.1",
     "@beyond-js/mformat": "^0.0.2",
+    "node-fetch": "^2.6.7",
+    "yargs": "^17.6.2",
     "semver": "^7.3.8",
     "tar-stream": "^2.2.0",
     "zlib": "^1.0.5",
     "concat-with-sourcemaps": "^1.1.0",
     "mime-types": "^2.1.35"
   },
+  "devDependencies": {
+    "express": "^4.18.2"
+  },
   "imports": {
     "#store": "./store/index.js"
   },
   "exports": {
+    ".": "./index.js",
     "./packages-registry": "./packages-registry/index.js",
     "./packages-content": "./packages-content/index.js",
     "./packager": "./packager/index.js",
-    "./dependencies-tree": "./dependencies-tree/index.js"
+    "./dependencies-tree": "./dependencies-tree/index.js",
+    "./router": "./router/index.js",
+    "./installer": "./installer/index.js"
   }
 }

@@ -1,4 +1,4 @@
-const packages = require('@beyond-js/cloud-functions/packages-registry');
+const packages = require('@beyond-js/uimport/packages-registry');
 const SpecifierParser = require('@beyond-js/specifier-parser');
 const Dependency = require('./dependency');
 const NameSpace = require('./namespace');

@@ -1,3 +1,3 @@
 exports.entities = require('./entities');
-exports.File = require('./file');
-exports.logger = require('./logger');
+exports.storage = require('./storage');
+exports.Logger = require('./logger');

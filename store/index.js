@@ -5,14 +5,27 @@ module.exports = new class {
      */
     #initialised = false;
 
+    get entities() {
+        return this.store.entities;
+    }
+
+    get storage() {
+        return this.store.storage;
+    }
+
+    get Logger() {
+        return this.store.Logger;
+    }
+
     #store;
     get store() {
-        this.#initialised = true;
+        if (!this.#initialised) throw new Error('Store not initialised');
         return this.#store;
     }
 
-    set store(value) {
+    initialise(value) {
         if (this.#initialised) throw new Error('Store cannot be replaced after it was previously obtained');
-        this.#store = value;
+        this.#initialised = true;
+        this.#store = value ? value : require('./store');
     }
 }

@@ -1,0 +1,1 @@
+exports.PackageFile = require('./package');

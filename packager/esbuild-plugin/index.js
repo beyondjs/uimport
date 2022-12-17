@@ -1,4 +1,4 @@
-const packages = require('@beyond-js/cloud-functions/packages-content');
+const packages = require('@beyond-js/uimport/packages-content');
 const Resolver = require('./resolver');
 const {sep} = require('path');
 

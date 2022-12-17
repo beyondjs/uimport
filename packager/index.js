@@ -1,12 +1,12 @@
-const {DependenciesTree} = require('@beyond-js/cloud-functions/dependencies-tree');
-const packages = require('@beyond-js/cloud-functions/packages-content');
-const registry = require('@beyond-js/cloud-functions/packages-registry');
+const {DependenciesTree} = require('@beyond-js/uimport/dependencies-tree');
+const packages = require('@beyond-js/uimport/packages-content');
+const registry = require('@beyond-js/uimport/packages-registry');
 const Plugin = require('./esbuild-plugin');
 const SourceMap = require('./sourcemap');
 const {sep} = require('path');
 const resolveRequireCalls = require('./require-calls');
 const SpecifierParser = require('@beyond-js/specifier-parser');
-const Logs = require('./logs');
+const {Logger} = require('#store');
 
 module.exports = class {
     #vspecifier;
@@ -58,13 +58,13 @@ module.exports = class {
         return !this.#errors?.length;
     }
 
-    #logs;
-    get logs() {
-        return this.#logs;
+    #logger;
+    get logger() {
+        return this.#logger;
     }
 
     async log(text, severity) {
-        await this.#logs.add(text, severity);
+        await this.#logger.add(text, severity);
     }
 
     /**
@@ -78,7 +78,9 @@ module.exports = class {
 
         this.#vspecifier = vspecifier;
         this.#platform = platform;
-        this.#logs = new Logs(vspecifier);
+
+        const {pkg, version} = vspecifier;
+        this.#logger = new Logger(`modules-create-${pkg}-${version}`);
     }
 
     /**

@@ -1,5 +1,5 @@
 const {entities: {Package: PackageStore, Application: ApplicationStore}} = require('#store');
-const packages = require('@beyond-js/cloud-functions/packages-registry');
+const packages = require('@beyond-js/uimport/packages-registry');
 const DependenciesConfig = require('../config');
 const TreeData = require('./data');
 
@@ -10,6 +10,11 @@ module.exports = class extends Map {
     #id;
     get id() {
         return this.#id;
+    }
+
+    #application;
+    get application() {
+        return this.#application;
     }
 
     #pkg;
@@ -105,7 +110,7 @@ module.exports = class extends Map {
         }
 
         const data = new TreeData();
-        const tree = JSON.parse(this.#value.dependenciesTree);
+        const tree = JSON.parse(this.#store.value.dependenciesTree);
         data.hydrate(tree);
         this.#dump(data);
     }
