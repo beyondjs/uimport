@@ -25,6 +25,10 @@ module.exports = class {
 
         for (const {pkg, version} of dependencies.list.values()) {
             console.log(`… ${pkg}@${version}`);
+
+            const dependencies = new DependenciesTree({pkg, version});
+            await dependencies.process({load: true});
+
             const vpackage = packages.get(pkg, version);
             await vpackage.process();
         }

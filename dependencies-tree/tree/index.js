@@ -109,7 +109,7 @@ module.exports = class extends Map {
 
     async load() {
         await this.#store.load();
-        if (!this.#store.value) {
+        if (!this.#store.value?.dependenciesTree) {
             this.#loaded = false;
             return;
         }
