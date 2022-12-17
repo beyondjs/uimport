@@ -15,19 +15,20 @@
     "uimport": "bin/index.js"
   },
   "dependencies": {
-    "esbuild": "^0.16.1",
     "@beyond-js/crc32": "^0.0.1",
     "@beyond-js/equal": "^0.0.1",
-    "@beyond-js/specifier-parser": "^0.0.2",
-    "@beyond-js/pending-promise": "^0.0.1",
     "@beyond-js/mformat": "^0.0.2",
+    "@beyond-js/pending-promise": "^0.0.1",
+    "@beyond-js/specifier-parser": "^0.0.2",
+    "concat-with-sourcemaps": "^1.1.0",
+    "esbuild": "^0.16.1",
+    "mime-types": "^2.1.35",
     "node-fetch": "^2.6.7",
-    "yargs": "^17.6.2",
     "semver": "^7.3.8",
     "tar-stream": "^2.2.0",
-    "zlib": "^1.0.5",
-    "concat-with-sourcemaps": "^1.1.0",
-    "mime-types": "^2.1.35"
+    "uglify-js": "^3.17.4",
+    "yargs": "^17.6.2",
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "express": "^4.18.2"
@@ -42,6 +43,7 @@
     "./packager": "./packager/index.js",
     "./dependencies-tree": "./dependencies-tree/index.js",
     "./router": "./router/index.js",
-    "./installer": "./installer/index.js"
+    "./installer": "./installer/index.js",
+    "./server": "./server/index.js"
   }
 }

@@ -4,6 +4,7 @@ const SEPARATOR = '\n![!SEPARATOR!]!\n';
 const cwd = process.cwd();
 
 module.exports = class {
+    #dirname;
     #path;
 
     #error;
@@ -11,11 +12,23 @@ module.exports = class {
         return this.#error;
     }
 
+    #initialised = false;
+
     constructor(id) {
-        this.#path = join(cwd, 'logs', id);
+        this.#dirname = join(cwd, 'logs');
+        this.#path = join(this.#dirname, id);
+    }
+
+    async #initialise() {
+        if (this.#initialised) return;
+        this.#initialised = true;
+
+        await fs.mkdir(this.#dirname, {recursive: true});
     }
 
     async add(text, severity) {
+        await this.#initialise();
+
         severity = severity ? severity : 'INFO';
         const metadata = {severity};
 

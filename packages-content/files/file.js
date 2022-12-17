@@ -59,7 +59,7 @@ module.exports = class {
 
     async process() {
         const source = `${this.#pkg}@${this.#version}/${this.#path}`;
-        const file = PackageFile(source);
+        const file = new PackageFile(source);
         await file.load();
 
         const {valid, error, content} = file;
