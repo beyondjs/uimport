@@ -2,7 +2,7 @@ const register = require('./register');
 const get = require('./get');
 const browser = require('./browser');
 
-module.exports = async function (pathname, req, res) {
+module.exports = async function (pathname, route, res) {
     const split = pathname.split('/');
     if (!split.length || !['register', 'get', 'browser'].includes(split[0])) {
         res.status(404).send('Error: (404) - Invalid URL: action "register" or "get" must be specified').end();
@@ -24,7 +24,7 @@ module.exports = async function (pathname, req, res) {
     const id = `${customer}/${application}`;
 
     if (vdir === 'register') {
-        await register(id, req, res);
+        await register(id, route, res);
     }
     else if (vdir === 'get') {
         await get(id, res);

@@ -14,8 +14,10 @@ module.exports = class {
 
     #initialised = false;
 
-    constructor(id) {
-        this.#dirname = join(cwd, 'logs');
+    constructor(container, id) {
+        if (id.includes('/') || id.includes('\\')) throw new Error('Invalid id');
+
+        this.#dirname = join(cwd, '.beyond/logs', container);
         this.#path = join(this.#dirname, id);
     }
 

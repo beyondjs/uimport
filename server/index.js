@@ -1,5 +1,5 @@
 const express = require('express');
-const router = require('../router');
+const {Route, router} = require('@beyond-js/router');
 
 module.exports = class {
     #app;
@@ -11,7 +11,13 @@ module.exports = class {
         app.use(express.json());
 
         app.all('*', (req, res) => {
-            router(req, res).catch(exc => {
+            const route = new Route(req);
+            if (route.error) {
+                res.status(404).send(`Error: (404) - ${route.error}`).end();
+                return;
+            }
+
+            router(route, res).catch(exc => {
                 console.log(exc.stack);
                 res.status(500).send(`Error: (500) - Error caught processing request: ${exc.message}`);
             });

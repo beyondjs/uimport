@@ -1,13 +1,15 @@
 const Packager = require('@beyond-js/uimport/packager');
 const mformat = require('@beyond-js/mformat');
 
-module.exports = async function (specifier, req, res) {
+module.exports = async function (specifier, route, res) {
+    res.set('Access-Control-Allow-Origin', '*');
+
     if (!specifier.version) {
         res.status(404).send('Error: (404) - Package version must be set').end();
         return;
     }
 
-    const {query} = req;
+    const {query} = route;
     const options = {
         platform: query.platform ? query.platform : 'browser',
         format: query.format ? query.format : 'esm',
