@@ -1,12 +1,9 @@
-const {DependenciesTree} = require('@beyond-js/uimport/dependencies-tree');
-
-module.exports = async function (id, res) {
-    const dependencies = new DependenciesTree({id});
+module.exports = async function (dependencies, res) {
     await dependencies.load({load: true});
 
     const {loaded, valid, errors} = dependencies;
     if (!loaded) {
-        res.status(404).send(`Error: (404) - Application dependencies "${id}" not found`).end();
+        res.status(404).send(`Error: (404) - Application dependencies "${application}" not found`).end();
         return;
     }
 

@@ -1,35 +1,43 @@
+const {DependenciesTree} = require('@beyond-js/uimport/dependencies-tree');
 const register = require('./register');
 const get = require('./get');
 const browser = require('./browser');
 
-module.exports = async function (pathname, route, res) {
-    const split = pathname.split('/');
-    if (!split.length || !['register', 'get', 'browser'].includes(split[0])) {
-        res.status(404).send('Error: (404) - Invalid URL: action "register" or "get" must be specified').end();
+module.exports = async function (route, res) {
+    if (route.action === 'register') {
+        await register(route, res);
         return;
     }
 
-    const vdir = split.shift();
-    if (split.length > 2) {
-        res.status(404).send('Error: (404) - Invalid URL, just specify customer id and application id').end();
-        return;
-    }
-    if (split.length !== 2) {
-        res.status(404).send('Error: (404) - Invalid URL, customer id and application id must be specified').end();
+    const {dependencies, error} = (() => {
+        if (route.vdir === 'app.dependencies') {
+            const {application} = route;
+            const dependencies = new DependenciesTree({application});
+            return {dependencies};
+        }
+        else {
+            const {pkg, version, subpath} = route.specifier;
+            if (subpath !== '.') {
+                const error = `Invalid url package subpath "${subpath}" should not be specified`;
+                return {error};
+            }
+
+            const dependencies = new DependenciesTree({pkg, version});
+            return {dependencies};
+        }
+    })();
+    if (error) {
+        res.status(404).send(error).end();
         return;
     }
 
-    const customer = split.shift();
-    const application = split.shift();
-    const id = `${customer}/${application}`;
-
-    if (vdir === 'register') {
-        await register(id, route, res);
+    if (route.action === 'get') {
+        await get(dependencies, res);
     }
-    else if (vdir === 'get') {
-        await get(id, res);
+    else if (route.options.platform === 'browser') {
+        await browser(dependencies, res);
     }
-    else if (vdir === 'browser') {
-        await browser(id, res);
+    else {
+        res.status(404).send('Platform is undefined or invalid').end();
     }
 }

@@ -1,12 +1,12 @@
 const {DependenciesTree} = require('@beyond-js/uimport/dependencies-tree');
 
-module.exports = async function (id, route, res) {
+module.exports = async function (route, res) {
     if (!route.body) {
         res.status(404).send('Dependencies configuration must be specified').end();
         return;
     }
 
-    const dependencies = new DependenciesTree({id, json: route.body});
+    const dependencies = new DependenciesTree({application: route.application, json: route.body});
     await dependencies.process({load: false});
 
     const {valid, errors} = dependencies;

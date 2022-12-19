@@ -7,11 +7,6 @@ module.exports = class extends Map {
     #config;
     #store;
 
-    #id;
-    get id() {
-        return this.#id;
-    }
-
     #application;
     get application() {
         return this.#application;

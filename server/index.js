@@ -1,5 +1,5 @@
 const express = require('express');
-const {Route, router} = require('@beyond-js/router');
+const {Route, router} = require('@beyond-js/uimport/router');
 
 module.exports = class {
     #app;
