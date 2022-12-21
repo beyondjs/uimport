@@ -17,18 +17,23 @@ const cases = new Set(['react-dom']);
 // const cases = new Set(['tslib']);
 // const cases = new Set(['framesync']);
 // const cases = new Set(['firebase/app']);
+// const cases = new Set(['@mui/utils']);
+// const cases = new Set(['@mui/material/button']);
 // const cases = new Set(['socket.io-client']);
 // const cases = new Set(['socket.io-parser']);
 // const cases = new Set(['engine.io-parser']);
-// const cases = new Set(['@mui/utils']);
-// const cases = new Set(['@mui/material/button']);
+// const cases = new Set(['engine.io-client']);
+// const cases = new Set(['@beyond-js/kernel/core']);
+// const cases = new Set(['@beyond-js/widgets/layout']);
 
-const paths = {
+const UISpecs = {
     cwd: __dirname, // The working directory
     temp: p.join(__dirname, '.uimport/temp'),
-    cache: p.join(__dirname, '.uimport/cache')
+    cache: p.join(__dirname, '.uimport/cache'),
+    versions: true,
+    // prePath: 'packages'
 };
-const modes = ['sjs'];
+const modes = ['sjs', 'amd', 'esm'];
 
 (async () => {
     const report = {errors: new Map()};
@@ -38,7 +43,7 @@ const modes = ['sjs'];
         if (generated.has(bundle)) return; // Bundle already generated
 
         console.log(`Processing bundle: "${bundle}"`);
-        const {errors, code, pkg, subpath, version, dependencies} = await uimport(bundle, mode, paths);
+        const {errors, code, pkg, subpath, version, dependencies} = await uimport(bundle, mode, UISpecs);
 
         if (errors) {
             console.log(`Errors found on bundle "${bundle}"`.red)
@@ -46,7 +51,7 @@ const modes = ['sjs'];
             return;
         }
 
-        const file = `${mode}/${pkg.name}@${version}` + (subpath ? `/${subpath.slice(2)}.js` : '.js');
+        const file = `${mode}/${pkg.name}${version ? `@${version}` : ''}` + (subpath ? `/${subpath.slice(2)}.js` : '.js');
         const target = p.join(__dirname, 'html/packages', file);
         await fs.mkdir(p.dirname(target), {recursive: true});
         await fs.writeFile(target, code, 'utf8');
