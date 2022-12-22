@@ -3,24 +3,33 @@ const {DependenciesTree} = require('@beyond-js/uimport/dependencies-tree');
 const packages = require('@beyond-js/uimport/packages-content');
 
 module.exports = class {
-    #cwd;
+    #specs;
 
-    constructor(cwd) {
-        this.#cwd = cwd ? cwd : process.cwd();
+    constructor(specs) {
+        specs = specs ? specs : {};
+
+        if (typeof specs !== 'object') throw new Error('Invalid specification. An object is expected.');
+        if (specs.json && typeof specs.json !== 'object') throw new Error('Invalid .json specification');
+        if (specs.internals && typeof specs.internals !== 'object') throw new Error('Invalid .internals specification');
+        this.#specs = specs;
     }
 
     async process() {
-        let json;
-        try {
-            const path = join(this.#cwd, 'package.json');
-            json = require(path);
-        }
-        catch (exc) {
-            console.log(`Error reading package.json file: "${exc.message}"`);
-            return;
-        }
+        const json = (() => {
+            if (this.#specs.json) return this.#specs.json;
 
-        const dependencies = new DependenciesTree({json});
+            try {
+                const path = join(process.cwd(), 'package.json');
+                return require(path);
+            }
+            catch (exc) {
+                console.log(`Error reading package.json file: "${exc.message}"`);
+            }
+        })();
+        if (!json) return;
+
+        const {internals} = this.#specs;
+        const dependencies = new DependenciesTree({json, internals});
         await dependencies.process({load: true});
 
         for (const {pkg, version} of dependencies.list.values()) {

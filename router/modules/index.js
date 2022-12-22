@@ -11,10 +11,16 @@ module.exports = async function (specifier, options, res) {
 
     const packager = new Packager(specifier, options.platform);
     if (options.logs) {
-        const entries = (await packager.logs.get())[0].reverse();
+        const {entries, error} = await (async () => {
+            const entries = await packager.logger.get();
+            const {error} = packager.logger;
+            return error ? {entries: [], error} : {entries: entries.reverse()};
+        })();
+
         let html = `<h1>"${specifier.value}" logs</h1>`;
 
-        !entries.length && (html += 'No logs were found');
+        error && (html += `Error found getting logs: "${error}"`);
+        !error && !entries.length && (html += 'No logs were found');
 
         entries.forEach(entry => {
             const {metadata, data} = entry;

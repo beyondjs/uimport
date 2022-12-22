@@ -36,14 +36,15 @@ module.exports = class {
 
         console.log(text);
 
-        const value = JSON.stringify({metadata, text}) + SEPARATOR;
+        const value = JSON.stringify({metadata, data: text}) + SEPARATOR;
         await fs.appendFile(this.#path, value);
     }
 
     async get() {
         try {
-            const entries = (await fs.readFile(this.#path)).split(SEPARATOR);
-            return entries.map(entry => JSON.parse(entry));
+            const content = (await fs.readFile(this.#path)).toString();
+            const entries = content.split(SEPARATOR);
+            return entries.filter(entry => !!entry).map(entry => JSON.parse(entry));
         }
         catch (exc) {
             this.#error = exc.message;

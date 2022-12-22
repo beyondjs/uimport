@@ -1,15 +1,18 @@
 {
-  "private": true,
   "name": "@beyond-js/uimport",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": "https://github.com/beyondjs/uimport",
   "files": [
+    "bin",
     "dependencies-tree",
+    "installer",
     "packager",
     "packages-content",
     "packages-registry",
     "router",
-    "store"
+    "server",
+    "store",
+    "index.js"
   ],
   "bin": {
     "uimport": "bin/index.js"
