@@ -79,12 +79,9 @@ module.exports = class {
         if (vdir === 'app.dependencies') {
             const split = pathname.split('/');
             if (!split.length) return done({error: `Platform or action must be specified`});
-            if (!['register', 'get'].includes(split[0])) {
-                const error = `Action "${split[0]}" is invalid`;
-                return done({error});
+            if (['register', 'get'].includes(split[0])) {
+                this.#action = split.shift();
             }
-
-            this.#action = split.shift();
 
             if (split.length > 2) {
                 const error = 'Error: (404) - Invalid URL, just specify customer id and application id';

@@ -33,11 +33,14 @@ module.exports = async function (route, res) {
 
     if (route.action === 'get') {
         await get(dependencies, res);
+        return;
     }
-    else if (route.options.platform === 'browser') {
-        await browser(dependencies, res);
+
+    const platforms = ['browser'];
+    if (!platforms.includes(route.options.platform)) {
+        res.status(404).send('Please specify a valid platform').end();
     }
     else {
-        res.status(404).send('Platform is undefined or invalid').end();
+        await browser(dependencies, res);
     }
 }

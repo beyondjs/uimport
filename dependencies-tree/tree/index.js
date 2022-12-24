@@ -1,11 +1,12 @@
 const {entities: {Package: PackageStore, Application: ApplicationStore}} = require('#store');
-const packages = require('@beyond-js/uimport/packages-registry');
 const DependenciesConfig = require('../config');
 const TreeData = require('./data');
+const Dependency = require('./dependency');
 
 module.exports = class extends Map {
     #config;
     #store;
+    #internals;
 
     #application;
     get application() {
@@ -52,9 +53,10 @@ module.exports = class extends Map {
      * @param pkg? {string} The package name
      * @param version? {string} The version of the package
      * @param json? {*} The dependencies specification
+     * @param internals? {<string, {dependencies: *, devDependencies: *, peerDependencies: *}>} The internal packages
      * @param id? {string}
      */
-    constructor({application, pkg, version, json}) {
+    constructor({application, pkg, version, json, internals}) {
         super();
 
         if (json?.name && json?.version) {
@@ -72,6 +74,7 @@ module.exports = class extends Map {
         this.#application = application;
         this.#pkg = pkg;
         this.#version = version;
+        this.#internals = internals ? internals : new Map();
         this.#store = application ? new ApplicationStore(application) : new PackageStore(pkg, version);
 
         this.#config = (() => {
@@ -135,29 +138,19 @@ module.exports = class extends Map {
             for (const [name, {kind, version}] of dependencies) {
                 if (kind === 'development') continue;
 
-                const done = ({vpackage, dependencies, error}) => {
-                    if (error) {
-                        output.set(name, {error});
-                        return;
-                    }
-
-                    const {version} = vpackage;
-                    output.set(name, {version, dependencies});
+                const done = ({version, dependencies, error}) => {
+                    error ? output.set(name, {error}) : output.set(name, {version, dependencies});
                 }
 
-                /**
-                 * Look up the dependency in the NPM registry
-                 * Do not move the packages require to the beginning of the file to avoid a circular dependency
-                 */
-                const vpackage = await packages.get(name).versions.get(version);
-                if (!vpackage?.valid) {
-                    const error = vpackage?.error || `Dependency version "${version}" cannot be satisfied`;
-                    done(({error}));
+                const dependency = new Dependency(name, version, this.#internals);
+                await dependency.process();
+                if (dependency.error) {
+                    done(({error: dependency.error}));
                     continue;
                 }
 
-                const dependencies = await recursive(vpackage.dependencies);
-                done({vpackage, dependencies});
+                const dependencies = await recursive(dependency.dependencies);
+                done({version: dependency.version, dependencies});
             }
             return output;
         }
