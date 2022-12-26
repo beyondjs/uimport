@@ -1,5 +1,5 @@
 const fs = require('fs').promises;
-const {join} = require('path');
+const {join, dirname} = require('path');
 const SEPARATOR = '\n![!SEPARATOR!]!\n';
 const cwd = process.cwd();
 
@@ -14,11 +14,15 @@ module.exports = class {
 
     #initialised = false;
 
-    constructor(container, id) {
-        if (id.includes('/') || id.includes('\\')) throw new Error('Invalid id');
+    constructor({container, pkg, version}) {
+        if (!container || !pkg || !version) throw new Error('Invalid parameters');
+        // Actually only 'modules.create' container is expected
+        if (!['modules.create'].includes(container)) throw new Error('Action "${container}" not found');
 
-        this.#dirname = join(cwd, '.beyond/logs', container);
-        this.#path = join(this.#dirname, id);
+        if (container.includes('/') || container.includes('\\')) throw new Error('Invalid container specification');
+
+        this.#path = join(cwd, '.beyond/logs/packager', `${pkg}@${version}.json`);
+        this.#dirname = dirname(this.#path);
     }
 
     async #initialise() {

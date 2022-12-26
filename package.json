@@ -1,6 +1,6 @@
 {
   "name": "@beyond-js/uimport",
-  "version": "0.0.3",
+  "version": "0.0.7",
   "repository": "https://github.com/beyondjs/uimport",
   "files": [
     "bin",

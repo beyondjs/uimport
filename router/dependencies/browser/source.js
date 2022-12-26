@@ -9,6 +9,6 @@ System.constructor.prototype.resolve = (id, parent) => {
 
     if(!dependencies.has(pkg)) return id;
     const version = dependencies.get(pkg);
-    return \`http://34.160.68.253/modules/\${pkg}@\${version}\${subpath}?format=sjs\`;
+    return \`https://cdn.beyondjs.com/modules/\${pkg}@\${version}\${subpath}?format=sjs\`;
 };
 })()`.trim();

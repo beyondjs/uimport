@@ -80,12 +80,7 @@ module.exports = class {
         this.#platform = platform;
 
         const {pkg, version} = vspecifier;
-        this.#logger = (() => {
-            const split = pkg.split('/');
-            const scope = split[0].startsWith('@') ? split.shift() : void 0;
-            const name = scope ? `${scope}!${split.shift()}` : split.shift();
-            return new Logger('modules.create', `${name}-${version}`);
-        })();
+        this.#logger = new Logger({container: 'modules.create', pkg, version});
     }
 
     /**

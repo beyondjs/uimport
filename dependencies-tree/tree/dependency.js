@@ -8,7 +8,10 @@ module.exports = class {
         return this.#pkg;
     }
 
-    #version;
+    #version = {};
+    /**
+     * @return {{declared: string, resolved: string}}
+     */
     get version() {
         return this.#version;
     }
@@ -27,12 +30,12 @@ module.exports = class {
 
     constructor(pkg, version, internals) {
         this.#pkg = pkg;
-        this.#version = version;
+        this.#version.declared = version;
         this.#internals = internals;
     }
 
     async process() {
-        const vname = `${this.#pkg}@${this.#version}`;
+        const vname = `${this.#pkg}@${this.#version.declared}`;
 
         /**
          * Check if it is an dependency of an internal package
@@ -44,11 +47,12 @@ module.exports = class {
             /**
              * Check if the version of the internal package satisfy the version specified in the dependency
              */
-            if (!satisfies(v, this.#version)) {
+            if (!satisfies(v, this.#version.declared)) {
                 this.#error = `Internal dependency does not satisfies version "${v}"`;
                 return;
             }
 
+            this.#version.resolved = v;
             this.#dependencies = new DependenciesConfig({dependencies, devDependencies, peerDependencies});
             return;
         }
@@ -56,12 +60,13 @@ module.exports = class {
         /**
          * Look up the dependency in the NPM registry
          */
-        const vpackage = await packages.get(this.#pkg).versions.get(this.#version);
+        const vpackage = await packages.get(this.#pkg).versions.get(this.#version.declared);
         if (vpackage?.valid) {
+            this.#version.resolved = vpackage.version;
             this.#dependencies = vpackage.dependencies;
         }
         else {
-            this.#error = vpackage?.error || `Dependency version "${this.#version}" cannot be satisfied`;
+            this.#error = vpackage?.error || `Dependency version "${this.#version.declared}" cannot be satisfied`;
         }
     }
 }

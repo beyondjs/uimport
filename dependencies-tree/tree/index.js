@@ -150,7 +150,7 @@ module.exports = class extends Map {
                 }
 
                 const dependencies = await recursive(dependency.dependencies);
-                done({version: dependency.version, dependencies});
+                done({version: dependency.version.resolved, dependencies});
             }
             return output;
         }
