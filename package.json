@@ -20,6 +20,7 @@
     "./server": "./lib/server/index.js"
   },
   "dependencies": {
+    "@babel/core": "^7.17.9",
     "@babel/generator": "^7.17.9",
     "@babel/traverse": "^7.17.9",
     "cjs-module-lexer": "^1.2.2",
