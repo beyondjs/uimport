@@ -30,7 +30,9 @@
     "yargs": "^17.5.1",
     "resolve-package-path": "^4.0.3",
     "convert-source-map": "^2.0.0",
-    "concat-with-sourcemaps": "^1.1.0"
+    "concat-with-sourcemaps": "^1.1.0",
+    "@beyond-js/specifier-parser": "^0.0.2",
+    "@beyond-js/fs": "^0.0.1"
   },
   "keywords": [
     "packaging",
