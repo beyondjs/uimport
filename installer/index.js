@@ -32,6 +32,9 @@ module.exports = class {
         const dependencies = new DependenciesTree({json, internals});
         await dependencies.process({load: true});
 
+        !dependencies.list.size ? console.log('No dependencies found') :
+            console.log(`${dependencies.list.size} dependencies found`);
+
         for (const {pkg, version} of dependencies.list.values()) {
             console.log(`… ${pkg}@${version}`);
 

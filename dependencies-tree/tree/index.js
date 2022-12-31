@@ -114,8 +114,10 @@ module.exports = class extends Map {
 
         const data = new TreeData();
         const tree = JSON.parse(this.#store.value.dependenciesTree);
+
         data.hydrate(tree);
         this.#dump(data);
+        console.log('Dependencies tree already processed');
     }
 
     async process(specs) {
