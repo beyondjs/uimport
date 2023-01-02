@@ -24,6 +24,7 @@
     "@beyond-js/pending-promise": "^0.0.1",
     "@beyond-js/specifier-parser": "^0.0.2",
     "concat-with-sourcemaps": "^1.1.0",
+    "colors": "^1.4.0",
     "esbuild": "^0.16.1",
     "mime-types": "^2.1.35",
     "node-fetch": "^2.6.7",

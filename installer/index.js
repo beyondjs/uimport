@@ -1,6 +1,7 @@
 const {join} = require('path');
 const {DependenciesTree} = require('@beyond-js/uimport/dependencies-tree');
 const packages = require('@beyond-js/uimport/packages-content');
+const Internals = require('./internals');
 
 module.exports = class {
     #specs;
@@ -28,7 +29,7 @@ module.exports = class {
         })();
         if (!json) return;
 
-        const {internals} = this.#specs;
+        const internals = new Internals(this.#specs.internals);
         const dependencies = new DependenciesTree({json, internals});
         await dependencies.process({load: true});
 
@@ -36,7 +37,8 @@ module.exports = class {
             console.log(`${dependencies.list.size} dependencies found`);
 
         for (const {pkg, version} of dependencies.list.values()) {
-            console.log(`… ${pkg}@${version}`);
+            const internal = internals.get(pkg)?.versions.obtain(version);
+            console.log(`… ${pkg}@${version} [${internal ? 'internal' : 'external'}]`);
 
             const dependencies = new DependenciesTree({pkg, version});
             await dependencies.process({load: true});
