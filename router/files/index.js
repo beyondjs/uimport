@@ -16,7 +16,7 @@ module.exports = async function (specifier, res) {
         return;
     }
     if (!valid) {
-        res.status(500).send(`Error: (500) - Error processing package "${specifier.vpkg}": ${error}`).end();
+        res.status(500).send(`Error: (500) - Error on package "${specifier.vpkg}": ${error}`).end();
         return;
     }
 

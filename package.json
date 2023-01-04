@@ -1,6 +1,6 @@
 {
   "name": "@beyond-js/uimport",
-  "version": "0.0.8",
+  "version": "0.0.10",
   "repository": "https://github.com/beyondjs/uimport",
   "files": [
     "bin",
@@ -12,7 +12,8 @@
     "router",
     "server",
     "store",
-    "index.js"
+    "index.js",
+    "version.js"
   ],
   "bin": {
     "uimport": "bin/index.js"
@@ -43,6 +44,7 @@
   },
   "exports": {
     ".": "./index.js",
+    "./version": "./version.js",
     "./packages-registry": "./packages-registry/index.js",
     "./packages-content": "./packages-content/index.js",
     "./packager": "./packager/index.js",

@@ -1,3 +1,5 @@
+const {version} = require('@beyond-js/uimport/version');
+
 module.exports = `(() => {
 const dependencies = new Map(/*dependencies*/);
 System.constructor.prototype.resolve = (id, parent) => {
@@ -9,6 +11,6 @@ System.constructor.prototype.resolve = (id, parent) => {
 
     if(!dependencies.has(pkg)) return id;
     const version = dependencies.get(pkg);
-    return \`https://cdn.beyondjs.com/modules/\${pkg}@\${version}\${subpath}?format=sjs\`;
+    return \`https://cdn.beyondjs.com/modules/\${pkg}@\${version}\${subpath}?format=sjs&version=${version}\`;
 };
 })()`.trim();

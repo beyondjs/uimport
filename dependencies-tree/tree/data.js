@@ -40,12 +40,12 @@ module.exports = class {
         const errors = [];
 
         const recursive = dependencies => dependencies.forEach(({error, dependencies, version, vpackage}, pkg) => {
-            const vpkg = `${pkg}@${version}`;
             if (error) {
-                errors.push(`Error on package "${vpkg}": ${error}`);
+                errors.push(`Error on package "${pkg}": ${error}`);
                 return;
             }
 
+            const vpkg = `${pkg}@${version}`;
             !list.has(vpkg) && list.set(vpkg, {vpkg, pkg, version, dependencies});
             dependencies && recursive(dependencies);
         });
