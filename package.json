@@ -1,6 +1,6 @@
 {
   "name": "@beyond-js/uimport",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "repository": "https://github.com/beyondjs/uimport",
   "files": [
     "bin",
@@ -24,6 +24,7 @@
     "@beyond-js/pending-promise": "^0.0.1",
     "@beyond-js/specifier-parser": "^0.0.2",
     "concat-with-sourcemaps": "^1.1.0",
+    "cjs-module-lexer": "^1.2.2",
     "colors": "^1.4.0",
     "esbuild": "^0.16.1",
     "mime-types": "^2.1.35",

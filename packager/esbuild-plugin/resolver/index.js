@@ -78,12 +78,12 @@ module.exports = class {
 
     async process() {
         const args = this.#args;
-        const kind = this.#kind = args.kind;
+        this.#kind = args.kind;
 
         /**
          * The entry point
          */
-        if (kind === 'entry-point') {
+        if (args.namespace === 'beyond:entry-point') {
             const {pkg, version, subpath} = this.#plugin.packager.vspecifier;
             const vpkg = await packages.get(pkg).versions.get(version);
             if (!vpkg.exports.has(subpath)) return;

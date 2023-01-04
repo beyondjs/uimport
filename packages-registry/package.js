@@ -117,12 +117,14 @@ module.exports = class {
      * sets it to the versions object to save them all.
      * @return {Promise<void>}
      */
-    async load() {
+    async load(specs) {
         if (this.#loaded) return;
         if (this.#promise) return await this.#promise;
         this.#promise = new PendingPromise();
 
         if (!this.#name) throw new Error('Package name must be set before loading tha package');
+
+        specs = specs ? specs : {};
 
         const done = () => {
             this.#promise.resolve();
@@ -136,7 +138,11 @@ module.exports = class {
         await this.#store.load();
         if (this.#store.value) {
             this.#hydrate(this.#store.value);
-            return done();
+
+            /**
+             * If not updating, just return
+             */
+            if (!specs.update) return done();
         }
 
         /**
@@ -152,7 +158,7 @@ module.exports = class {
              * to be able to save them all to the store and to use them when any version is instantiated
              * without needing to load them from the store
              */
-            data.versions && this.#versions.set(data.versions);
+            data.versions && await this.#versions.set(data.versions);
 
             /**
              * Once the versions are saved, then save the package data
@@ -164,14 +170,12 @@ module.exports = class {
             this.#error = error;
         }
 
-        done();
-        await this.save();
-    }
-
-    async save() {
-        await this.#versions.save();
-
+        /**
+         * Save to the store
+         */
         const json = this.toJSON();
         await this.#store.set(json);
+
+        done();
     }
 }

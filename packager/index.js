@@ -2,11 +2,9 @@ const {DependenciesTree} = require('@beyond-js/uimport/dependencies-tree');
 const packages = require('@beyond-js/uimport/packages-content');
 const registry = require('@beyond-js/uimport/packages-registry');
 const Plugin = require('./esbuild-plugin');
-const SourceMap = require('./sourcemap');
-const {sep} = require('path');
-const resolveRequireCalls = require('./require-calls');
 const SpecifierParser = require('@beyond-js/specifier-parser');
 const {Logger} = require('#store');
+const esm = require('./esm');
 
 module.exports = class {
     #vspecifier;
@@ -198,7 +196,7 @@ module.exports = class {
             sourcemap: 'external',
             logLevel: 'silent',
             platform: 'browser',
-            format: 'esm',
+            format: 'cjs',
             bundle: true,
             write: false,
             outfile: 'out.js',
@@ -210,20 +208,7 @@ module.exports = class {
         this.#errors = errors ? errors : [];
         this.#warnings = warnings ? warnings : [];
 
-        const {code, map} = (() => {
-            const output = {};
-            output.code = outputs?.find(({path}) => path.endsWith(`${sep}out.js`))?.text;
-            output.map = outputs?.find(({path}) => path.endsWith(`${sep}out.js.map`))?.text;
-
-            const requires = resolveRequireCalls(plugin);
-            if (!requires) return output;
-
-            const sourcemap = new SourceMap();
-            sourcemap.concat(requires.imports);
-            sourcemap.concat(requires.resolver);
-            sourcemap.concat(output.code, void 0, output.map);
-            return sourcemap;
-        })();
+        const {code, map} = esm(plugin.externals, outputs);
 
         this.#code = code;
         this.#map = map;

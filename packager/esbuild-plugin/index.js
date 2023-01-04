@@ -27,6 +27,10 @@ module.exports = class {
     }
 
     async #resolve(args) {
+        if (args.kind === 'entry-point') {
+            return {namespace: 'beyond:entry-point', path: '.'};
+        }
+
         await this.log(`Resolving "${args.path}"`);
 
         // The node of the graph being imported/required
@@ -49,6 +53,16 @@ module.exports = class {
     }
 
     async #load(args) {
+        if (args.namespace === 'beyond:entry-point') {
+            const specifier = this.#packager.vspecifier.specifier;
+            let contents = `export * from '${specifier}';`;
+
+            contents += '\n\n' +
+                `import _default from '${specifier}';\n` +
+                `export default _default;`;
+            return {contents};
+        }
+
         const {path, namespace} = args;
         await this.log(`Loading "${path}" on "${namespace}"`);
 

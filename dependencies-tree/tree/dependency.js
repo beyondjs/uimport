@@ -62,6 +62,10 @@ module.exports = class {
          * Look up the dependency in the NPM registry
          */
         const {declared} = this.#version;
+
+        const pkg = packages.get(this.#pkg);
+        pkg.load({update: true});
+
         const vpackage = await packages.get(this.#pkg).versions.get(declared);
         if (vpackage?.valid) {
             this.#version.resolved = vpackage.version;

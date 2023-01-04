@@ -51,23 +51,20 @@ module.exports = class {
      * Set the version object when fetched from the NPM registry API
      * @param versions {Record<string, *>}
      */
-    set(versions) {
+    async set(versions) {
         const previous = this.#versions;
 
         this.#versions.length = 0;
         versions = versions ? Object.values(versions).reverse() : [];
 
+        const promises = [];
         versions.forEach(data => {
             if (previous.includes(data.version)) return;
 
             this.#data.set(data.version, data);
             this.#versions.push(data.version);
+            promises.push(this.#get(data.version).save());
         });
-    }
-
-    async save() {
-        const promises = [];
-        this.#versions.forEach(vnumber => promises.push(this.#get(vnumber).save()));
         await Promise.all(promises);
     }
 

@@ -1,5 +1,4 @@
-module.exports = function (plugin) {
-    const {externals} = plugin;
+module.exports = function (externals) {
     const requires = [...externals]
         .filter(([, is]) => {
             return is.has('require-call') && !is.has('import-statement');
