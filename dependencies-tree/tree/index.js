@@ -107,13 +107,14 @@ module.exports = class extends Map {
 
     async load() {
         await this.#store.load();
-        if (!this.#store.value?.dependenciesTree) {
+        const {dependenciesTree, hash} = this.#store.value ? this.#store.value : {};
+        if (!dependenciesTree || hash !== this.#config.hash) {
             this.#loaded = false;
             return;
         }
 
         const data = new TreeData();
-        const tree = JSON.parse(this.#store.value.dependenciesTree);
+        const tree = JSON.parse(dependenciesTree);
 
         data.hydrate(tree);
         this.#dump(data);
@@ -161,7 +162,8 @@ module.exports = class extends Map {
         data.tree = await recursive(this.#config);
 
         // Tree is stored as a string as firestore object cannot be deeper than 20 levels
-        await this.#store.set({dependenciesTree: JSON.stringify(data.toJSON())});
+        const {hash} = this.#config;
+        await this.#store.set({hash, dependenciesTree: JSON.stringify(data.toJSON())});
         this.#dump(data);
     }
 
