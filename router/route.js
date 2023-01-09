@@ -42,14 +42,19 @@ module.exports = class {
     }
 
     constructor(req) {
-        const {pathname, vdir} = (() => {
-            let pathname = req.path.slice(1);
+        const {pathname, vdir, action} = (() => {
+            let action, pathname = req.path.slice(1);
             if (!pathname) return {pathname};
 
             const split = pathname.split('/');
             const vdir = split.shift();
             pathname = split.join('/');
-            return {vdir, pathname};
+
+            if (['app.dependencies', 'dependencies'].includes(vdir) &&
+                ['register', 'get'].includes(split[0])) {
+                action = split.shift();
+            }
+            return {vdir, action, pathname};
         })();
 
         const done = ({specifier, application, error}) => {
@@ -70,8 +75,9 @@ module.exports = class {
             };
             this.#body = req.body;
 
-            this.#pathname = pathname;
             this.#vdir = vdir;
+            this.#action = action;
+            this.#pathname = pathname;
             this.#application = application;
             this.#specifier = specifier;
         }
@@ -79,9 +85,6 @@ module.exports = class {
         if (vdir === 'app.dependencies') {
             const split = pathname.split('/');
             if (!split.length) return done({error: `Platform or action must be specified`});
-            if (['register', 'get'].includes(split[0])) {
-                this.#action = split.shift();
-            }
 
             if (split.length > 2) {
                 const error = 'Error: (404) - Invalid URL, just specify customer id and application id';

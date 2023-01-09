@@ -64,7 +64,7 @@ module.exports = class {
         const {declared} = this.#version;
 
         const pkg = packages.get(this.#pkg);
-        pkg.load({update: true});
+        pkg.load({fetch: true});
 
         const vpackage = await packages.get(this.#pkg).versions.get(declared);
         if (vpackage?.valid) {

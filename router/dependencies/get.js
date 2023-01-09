@@ -1,5 +1,5 @@
 module.exports = async function (dependencies, res) {
-    await dependencies.load({load: true});
+    await dependencies.load({update: false});
 
     const {loaded, valid, errors} = dependencies;
     if (!loaded) {

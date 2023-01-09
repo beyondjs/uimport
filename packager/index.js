@@ -170,7 +170,7 @@ module.exports = class {
          */
         await this.log('Processing the dependencies tree');
         const dependencies = new DependenciesTree({pkg, version});
-        await dependencies.process({load: true});
+        await dependencies.process({update: false});
         if (!dependencies.valid) {
             this.#errors = dependencies.errors;
             return;

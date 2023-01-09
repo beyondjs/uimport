@@ -7,7 +7,7 @@ module.exports = async function (route, res) {
     }
 
     const dependencies = new DependenciesTree({application: route.application, json: route.body});
-    await dependencies.process({load: false});
+    await dependencies.process({update: true});
 
     const {valid, errors} = dependencies;
     const json = {};

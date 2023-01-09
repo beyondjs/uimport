@@ -58,6 +58,11 @@ module.exports = class {
         return this.#versions;
     }
 
+    #fetchedTime;
+    get fetchedTime() {
+        return this.#fetchedTime;
+    }
+
     constructor(pkg) {
         if (!pkg) throw new Error('Package name must be specified');
 
@@ -81,6 +86,7 @@ module.exports = class {
         this.#license = values.license;
         this.#repository = values.repository;
         this.#distTags = values.distTags;
+        this.#fetchedTime = values.fetchedTime;
     }
 
     toJSON() {
@@ -92,8 +98,8 @@ module.exports = class {
             return json;
         }
 
-        const {name, description, homepage, license, repository, distTags, versions} = this;
-        const json = {found, name, description, homepage, license, repository, distTags};
+        const {name, description, homepage, license, repository, distTags, fetchedTime, versions} = this;
+        const json = {found, name, description, homepage, license, repository, distTags, fetchedTime};
         json.versions = versions.toJSON();
         return json;
     }
@@ -108,6 +114,11 @@ module.exports = class {
         return this.#loaded;
     }
 
+    #uptodate;
+    get uptodate() {
+        return this.#uptodate;
+    }
+
     #promise;
 
     /**
@@ -115,21 +126,23 @@ module.exports = class {
      * If the package is not stored in the store, then it fetch the package from the registry,
      * sets the package's properties, and since the NPM registry returns the versions data,
      * sets it to the versions object to save them all.
+     *
+     * @param specs {{fetch: boolean}} If property fetch is true, fetch the package if not previously fetched or outdated
      * @return {Promise<void>}
      */
     async load(specs) {
-        if (this.#loaded) return;
+        specs = specs ? specs : {};
+
         if (this.#promise) return await this.#promise;
         this.#promise = new PendingPromise();
 
         if (!this.#name) throw new Error('Package name must be set before loading tha package');
 
-        specs = specs ? specs : {};
-
-        const done = () => {
+        const done = ({loaded, uptodate}) => {
             this.#promise.resolve();
             this.#promise = void 0;
-            this.#loaded = true;
+            this.#loaded = !!loaded;
+            this.#uptodate = !!uptodate;
         }
 
         /**
@@ -137,13 +150,24 @@ module.exports = class {
          */
         await this.#store.load();
         if (this.#store.value) {
-            this.#hydrate(this.#store.value);
-
             /**
-             * If not updating, just return
+             * Check if package registry information is outdated
              */
-            if (!specs.update) return done();
+            const {fetchedTime} = this.#store.value;
+            const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+            const uptodate = fetchedTime && fetchedTime > fiveMinutesAgo;
+
+            if (uptodate) {
+                this.#hydrate(this.#store.value);
+                return done({loaded: true, uptodate: true});
+            }
+            else if (!specs.fetch) {
+                return done({loaded: true, uptodate: false});
+            }
         }
+        if (!specs.fetch) return done({loaded: false, uptodate: false});
+
+        const fetchedTime = Date.now();
 
         /**
          * As the package data is not in the store, then fetch it
@@ -163,7 +187,7 @@ module.exports = class {
             /**
              * Once the versions are saved, then save the package data
              */
-            this.#set(Object.assign({error, found}, data));
+            this.#set(Object.assign({fetchedTime, error, found}, data));
         }
         else {
             this.#found = found;
@@ -174,8 +198,8 @@ module.exports = class {
          * Save to the store
          */
         const json = this.toJSON();
-        await this.#store.set(json);
+        await this.#store.set(Object.assign({fetchedTime}, json));
 
-        done();
+        done({loaded: true});
     }
 }

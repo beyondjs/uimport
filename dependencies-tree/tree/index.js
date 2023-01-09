@@ -1,10 +1,10 @@
-const {entities: {Package: PackageStore, Application: ApplicationStore}} = require('#store');
-const DependenciesConfig = require('../config');
+const {entities: {VPackage: VPackageStore, Application: ApplicationStore}} = require('#store');
+const registry = require('@beyond-js/uimport/packages-registry');
 const TreeData = require('./data');
 const Dependency = require('./dependency');
+const DependenciesConfig = require('../config');
 
 module.exports = class extends Map {
-    #config;
     #store;
     #internals;
 
@@ -13,6 +13,7 @@ module.exports = class extends Map {
         return this.#application;
     }
 
+    #json;
     #pkg;
     get pkg() {
         return this.#pkg;
@@ -47,6 +48,55 @@ module.exports = class extends Map {
         return this.#loaded;
     }
 
+    #config;
+    config = async (specs) => {
+        if (!this.#pkg) {
+            throw new Error('Config can only be created when the package is specified');
+        }
+
+        if (this.#config) return this.#config;
+
+        if (this.#json) return this.#config = new DependenciesConfig(this.#json);
+
+        /**
+         * Check if it is an internal package
+         */
+        const internal = this.#internals.get(this.#pkg)?.versions.obtain(this.#version);
+        if (internal) {
+            return this.#config = internal.dependencies;
+        }
+
+        /**
+         * look for the package configuration in the npm registry
+         */
+        const pkg = registry.get(this.#pkg);
+        await pkg.load({fetch: specs.update}); // Fetch package from registry if not previously fetched
+        const {valid, found, loaded, error} = pkg;
+        const errors = this.#errors = [];
+
+        if (!found) {
+            errors.push(`Package "${this.#pkg}" not found`);
+            return;
+        }
+        if (!valid) {
+            errors.push(`Error found on package "${this.#pkg}": ${error}`);
+            return;
+        }
+        if (!loaded) {
+            errors.push(`Package "${this.#pkg}" hasn't been installed`);
+            return;
+        }
+
+        const vpackage = await pkg.versions.get(this.#version);
+        if (!vpackage) {
+            const versions = pkg.versions.values;
+            errors.push(`Version "${this.#version}" of package "${this.#pkg}" not found. Current versions are "${versions}"`);
+            return;
+        }
+        await vpackage.load();
+        return this.#config = vpackage.dependencies;
+    }
+
     /**
      * Dependencies tree constructor
      * @param application? {string} The identifier of the application: `${account}/${name}`
@@ -56,7 +106,7 @@ module.exports = class extends Map {
      * @param internals? {<string, {dependencies: *, devDependencies: *, peerDependencies: *}>} The internal packages
      * @param id? {string}
      */
-    constructor({application, pkg, version, json, internals}) {
+    constructor({application, json, pkg, version, internals}) {
         super();
 
         if (json?.name && json?.version) {
@@ -72,24 +122,11 @@ module.exports = class extends Map {
         }
 
         this.#application = application;
+        this.#json = json;
         this.#pkg = pkg;
         this.#version = version;
         this.#internals = internals ? internals : new Map();
-        this.#store = application ? new ApplicationStore(application) : new PackageStore(pkg, version);
-
-        this.#config = (() => {
-            if (!json && !pkg) return;
-
-            json = (() => {
-                if (json) return json;
-
-                json = {dependencies: {}};
-                json.dependencies[pkg] = version;
-                return json;
-            })();
-
-            return new DependenciesConfig(json);
-        })();
+        this.#store = application ? new ApplicationStore(application) : new VPackageStore(pkg, version);
     }
 
     /**
@@ -107,8 +144,15 @@ module.exports = class extends Map {
 
     async load() {
         await this.#store.load();
-        const {dependenciesTree, hash} = this.#store.value ? this.#store.value : {};
-        if (!dependenciesTree || hash !== this.#config.hash) {
+        const {dependenciesTree, hash} = (() => {
+            const {dependenciesTree: value} = this.#store.value ? this.#store.value : {dependenciesTree: {}};
+            const {dependenciesTree, hash} = value;
+            return {dependenciesTree, hash};
+        })();
+        const config = await this.config({update: false});
+        if (!config) return;
+
+        if (!dependenciesTree || hash !== config.hash) {
             this.#loaded = false;
             return;
         }
@@ -121,14 +165,28 @@ module.exports = class extends Map {
         console.log('Dependencies tree already processed');
     }
 
+    /**
+     * Process the dependencies tree
+     *
+     * @param specs {{update: boolean}}
+     * @return {Promise<void>}
+     */
     async process(specs) {
+        if (!specs) throw new Error('Invalid parameters');
+
         specs = specs ? specs : {};
-        if (!this.#config) {
-            throw new Error('Dependencies cannot be processed if its json configuration is not specified');
+        const config = await this.config(specs);
+        if (!config) return; // config is undefined if there errors were found
+
+        const errors = this.#errors = [];
+        if (!specs.update) {
+            await this.load();
+            if (!this.#loaded) {
+                errors.push(`Dependencies tree must be processed before accessing it`);
+                return;
+            }
         }
 
-        specs.load = specs.load === void 0 ? true : specs.load;
-        specs.load && await this.load();
         if (this.#loaded) return;
 
         /**
@@ -159,11 +217,12 @@ module.exports = class extends Map {
         }
 
         const data = new TreeData();
-        data.tree = await recursive(this.#config);
+        data.tree = await recursive(config);
 
         // Tree is stored as a string as firestore object cannot be deeper than 20 levels
-        const {hash} = this.#config;
-        await this.#store.set({hash, dependenciesTree: JSON.stringify(data.toJSON())});
+        const {hash} = config;
+        await this.#store.set({dependenciesTree: {hash, processed: JSON.stringify(data.toJSON())}});
+
         this.#dump(data);
     }
 

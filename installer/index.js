@@ -31,17 +31,17 @@ module.exports = class {
 
         const internals = new Internals(this.#specs.internals);
         const dependencies = new DependenciesTree({json, internals});
-        await dependencies.process({load: true});
+        await dependencies.process({update: true});
 
         !dependencies.list.size ? console.log('No dependencies found') :
             console.log(`${dependencies.list.size} dependencies found`);
 
         for (const {pkg, version} of dependencies.list.values()) {
             const internal = internals.get(pkg)?.versions.obtain(version);
-            console.log(`… ${pkg}@${version} [${internal ? 'internal' : 'external'}]`);
+            console.log(`… ${pkg}@${version}` + (internal ? '[internal]' : ''));
 
             const dependencies = new DependenciesTree({pkg, version});
-            await dependencies.process({load: true});
+            await dependencies.process({update: true});
 
             const vpackage = packages.get(pkg, version);
             await vpackage.process();

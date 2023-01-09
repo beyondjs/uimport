@@ -10,6 +10,10 @@ module.exports = class {
      */
     #versions = [];
 
+    get values() {
+        return this.#versions;
+    }
+
     /**
      * The instances of the versions returned by the get method
      * @type {Map<string, any>}
@@ -37,7 +41,8 @@ module.exports = class {
 
     async get(version) {
         await this.#pkg.load();
-        if (!this.#pkg.valid) return;
+        const {valid, found} = this.#pkg;
+        if (!valid || !found) return;
 
         const resolved = this.#versions.find(v => satisfies(v, version));
         if (!resolved) return;

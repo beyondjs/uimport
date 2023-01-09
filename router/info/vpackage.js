@@ -8,7 +8,7 @@ module.exports = async function (specifier, res) {
     }
 
     const dependencies = new DependenciesTree({pkg: specifier.pkg, version: specifier.version});
-    await dependencies.process({load: true});
+    await dependencies.process({update: false});
 
     const pkg = packages.get(specifier.pkg);
     const vpkg = await pkg.versions.get(specifier.version);
