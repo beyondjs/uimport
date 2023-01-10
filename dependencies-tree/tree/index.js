@@ -1,28 +1,11 @@
-const {entities: {VPackage: VPackageStore, Application: ApplicationStore}} = require('#store');
-const registry = require('@beyond-js/uimport/packages-registry');
 const TreeData = require('./data');
 const Dependency = require('./dependency');
-const DependenciesConfig = require('../config');
+const DependenciesConfig = require('./config');
+const Store = require('./store');
 
 module.exports = class extends Map {
     #store;
     #internals;
-
-    #application;
-    get application() {
-        return this.#application;
-    }
-
-    #json;
-    #pkg;
-    get pkg() {
-        return this.#pkg;
-    }
-
-    #version;
-    get version() {
-        return this.#version;
-    }
 
     #list = new Map();
     get list() {
@@ -49,71 +32,22 @@ module.exports = class extends Map {
     }
 
     #config;
-    config = async (specs) => {
-        if (!this.#pkg) {
-            throw new Error('Config can only be created when the package is specified');
-        }
-
-        if (this.#config) return this.#config;
-
-        if (this.#json) return this.#config = new DependenciesConfig(this.#json);
-
-        /**
-         * Check if it is an internal package
-         */
-        const internal = this.#internals.get(this.#pkg)?.versions.obtain(this.#version);
-        if (internal) {
-            return this.#config = internal.dependencies;
-        }
-
-        /**
-         * look for the package configuration in the npm registry
-         */
-        const pkg = registry.get(this.#pkg);
-        await pkg.load({fetch: specs.update}); // Fetch package from registry if not previously fetched
-        const {valid, found, loaded, error} = pkg;
-        const errors = this.#errors = [];
-
-        if (!found) {
-            errors.push(`Package "${this.#pkg}" not found`);
-            return;
-        }
-        if (!valid) {
-            errors.push(`Error found on package "${this.#pkg}": ${error}`);
-            return;
-        }
-        if (!loaded) {
-            errors.push(`Package "${this.#pkg}" hasn't been installed`);
-            return;
-        }
-
-        const vpackage = await pkg.versions.get(this.#version);
-        if (!vpackage) {
-            const versions = pkg.versions.values;
-            errors.push(`Version "${this.#version}" of package "${this.#pkg}" not found. Current versions are "${versions}"`);
-            return;
-        }
-        await vpackage.load();
-        return this.#config = vpackage.dependencies;
-    }
 
     /**
      * Dependencies tree constructor
+     *
      * @param application? {string} The identifier of the application: `${account}/${name}`
+     * @param json {*} The configuration of the dependencies when it refers to an application
      * @param pkg? {string} The package name
      * @param version? {string} The version of the package
-     * @param json? {*} The dependencies specification
      * @param internals? {<string, {dependencies: *, devDependencies: *, peerDependencies: *}>} The internal packages
-     * @param id? {string}
      */
     constructor({application, json, pkg, version, internals}) {
         super();
 
-        if (json?.name && json?.version) {
-            pkg = json.name;
-            version = json.version;
+        if (application && !json) {
+            throw new Error('json parameter is expected when application parameter is set');
         }
-
         if (!application && (!pkg || !version)) {
             throw new Error('Application parameter or pkg and version must be specified');
         }
@@ -121,12 +55,9 @@ module.exports = class extends Map {
             throw new Error('Invalid parameters, pkg/version should not be specified when application is set');
         }
 
-        this.#application = application;
-        this.#json = json;
-        this.#pkg = pkg;
-        this.#version = version;
-        this.#internals = internals ? internals : new Map();
-        this.#store = application ? new ApplicationStore(application) : new VPackageStore(pkg, version);
+        this.#internals = internals = internals ? internals : new Map();
+        this.#config = new DependenciesConfig({application, json, pkg, version, internals});
+        this.#store = new Store({application, pkg, version, internals});
     }
 
     /**
@@ -149,8 +80,13 @@ module.exports = class extends Map {
             const {dependenciesTree, hash} = value;
             return {dependenciesTree, hash};
         })();
-        const config = await this.config({update: false});
-        if (!config) return;
+
+        await this.#config.process({update: false});
+        if (!this.#config.valid) {
+            this.#errors = this.#config.errors;
+            return;
+        }
+        const config = this.#config;
 
         if (!dependenciesTree || hash !== config.hash) {
             this.#loaded = false;
@@ -175,10 +111,16 @@ module.exports = class extends Map {
         if (!specs) throw new Error('Invalid parameters');
 
         specs = specs ? specs : {};
-        const config = await this.config(specs);
-        if (!config) return; // config is undefined if there errors were found
+        await this.#config.process(specs);
+        if (!this.#config.valid) {
+            this.#errors = this.#config.errors;
+            return;
+        }
+        const config = this.#config;
 
         const errors = this.#errors = [];
+        void errors.length;
+
         if (!specs.update) {
             await this.load();
             if (!this.#loaded) {
