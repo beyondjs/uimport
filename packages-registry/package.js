@@ -157,8 +157,9 @@ module.exports = class {
             const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
             const uptodate = fetchedTime && fetchedTime > fiveMinutesAgo;
 
+            this.#hydrate(this.#store.value);
+
             if (uptodate) {
-                this.#hydrate(this.#store.value);
                 return done({loaded: true, uptodate: true});
             }
             else if (!specs.fetch) {

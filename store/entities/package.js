@@ -25,21 +25,32 @@ module.exports = class {
     }
 
     async load() {
+        this.#read = true;
+
         const exists = await new Promise(resolve =>
             fs.access(this.#path).then(() => resolve(true)).catch(() => resolve(false)));
         if (!exists) return;
 
-        this.#read = true;
-        const content = await fs.readFile(this.#path);
-        this.#value = JSON.parse(content);
+        try {
+            const content = await fs.readFile(this.#path, 'utf8');
+            this.#value = JSON.parse(content);
+        }
+        catch (exc) {
+            console.log(`Error loading package from store "${this.#path}": ${exc.message}`);
+        }
     }
 
     async set(data) {
         !this.#read && await this.load();
         const value = this.#value ? this.#value : {};
 
-        await fs.mkdir(this.#dirname, {recursive: true});
-        const content = JSON.stringify(Object.assign(value, data));
-        await fs.writeFile(this.#path, content);
+        try {
+            await fs.mkdir(this.#dirname, {recursive: true});
+            const content = JSON.stringify(Object.assign(value, data));
+            await fs.writeFile(this.#path, content);
+        }
+        catch (exc) {
+            console.log(`Error saving package info into store "${this.#path}": ${exc.message}`);
+        }
     }
 }

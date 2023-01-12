@@ -168,7 +168,6 @@ module.exports = class {
         /**
          * Process the dependencies tree
          */
-        await this.log('Processing the dependencies tree');
         const dependencies = new DependenciesTree({pkg, version});
         await dependencies.process({update: false});
         if (!dependencies.valid) {

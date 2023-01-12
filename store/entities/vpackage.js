@@ -33,13 +33,19 @@ module.exports = class {
     }
 
     async load() {
+        this.#read = true;
+
         const exists = await new Promise(resolve =>
             fs.access(this.#path).then(() => resolve(true)).catch(() => resolve(false)));
         if (!exists) return;
 
-        this.#read = true;
-        const content = await fs.readFile(this.#path);
-        this.#value = JSON.parse(content);
+        try {
+            const content = await fs.readFile(this.#path);
+            this.#value = JSON.parse(content);
+        }
+        catch (exc) {
+            console.log(`Error loading vpackage from store "${this.#path}": ${exc.message}`);
+        }
     }
 
     async set(data) {
@@ -47,8 +53,13 @@ module.exports = class {
         const value = this.#value ? this.#value : {};
         this.#value = Object.assign(value, data);
 
-        await fs.mkdir(this.#dirname, {recursive: true});
-        const content = JSON.stringify(this.#value);
-        await fs.writeFile(this.#path, content);
+        try {
+            await fs.mkdir(this.#dirname, {recursive: true});
+            const content = JSON.stringify(this.#value);
+            await fs.writeFile(this.#path, content);
+        }
+        catch (exc) {
+            console.log(`Error saving vpackage info into store "${this.#path}": ${exc.message}`);
+        }
     }
 }

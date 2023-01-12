@@ -2,6 +2,7 @@ const TreeData = require('./data');
 const Dependency = require('./dependency');
 const DependenciesConfig = require('./config');
 const Store = require('./store');
+const PendingPromise = require('@beyond-js/pending-promise');
 
 module.exports = class extends Map {
     #store;
@@ -73,14 +74,10 @@ module.exports = class extends Map {
         data.list.forEach((info, vpkg) => this.#list.set(vpkg, info));
     }
 
-    async load() {
-        await this.#store.load();
-        const {dependenciesTree, hash} = (() => {
-            const {dependenciesTree: value} = this.#store.value ? this.#store.value : {dependenciesTree: {}};
-            const {dependenciesTree, hash} = value;
-            return {dependenciesTree, hash};
-        })();
-
+    async #load() {
+        /**
+         * Process dependencies configuration and check if it is valid
+         */
         await this.#config.process({update: false});
         if (!this.#config.valid) {
             this.#errors = this.#config.errors;
@@ -88,18 +85,26 @@ module.exports = class extends Map {
         }
         const config = this.#config;
 
-        if (!dependenciesTree || hash !== config.hash) {
-            this.#loaded = false;
-            return;
-        }
+        /**
+         * Load dependencies tree from store
+         */
+        await this.#store.load();
+        const {dependenciesTree, hash} = (() => {
+            const {dependenciesTree: value} = this.#store.value ? this.#store.value : {dependenciesTree: {}};
+            const {processed: dependenciesTree, hash} = value;
+            return {dependenciesTree, hash};
+        })();
+
+        if (!dependenciesTree || hash !== config.hash) return;
 
         const data = new TreeData();
         const tree = JSON.parse(dependenciesTree);
 
         data.hydrate(tree);
         this.#dump(data);
-        console.log('Dependencies tree already processed');
     }
+
+    #promise;
 
     /**
      * Process the dependencies tree
@@ -110,23 +115,23 @@ module.exports = class extends Map {
     async process(specs) {
         if (!specs) throw new Error('Invalid parameters');
 
+        if (this.#promise) return await this.#promise;
+        this.#promise = new PendingPromise();
+
+        const done = ({errors}) => {
+            this.#errors = errors ? errors : [];
+            this.#promise.resolve();
+        }
+
         specs = specs ? specs : {};
         await this.#config.process(specs);
-        if (!this.#config.valid) {
-            this.#errors = this.#config.errors;
-            return;
-        }
+        if (!this.#config.valid) return done({errors: this.#config.errors});
         const config = this.#config;
 
-        const errors = this.#errors = [];
-        void errors.length;
-
         if (!specs.update) {
-            await this.load();
-            if (!this.#loaded) {
-                errors.push(`Dependencies tree must be processed before accessing it`);
-                return;
-            }
+            !this.#loaded && await this.#load();
+            if (!this.#loaded) return done({errors: [`Dependencies tree is not processed`]});
+            return done({});
         }
 
         if (this.#loaded) return;

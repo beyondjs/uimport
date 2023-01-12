@@ -16,7 +16,7 @@ module.exports = class {
         /**
          * Check if it is an internal package
          */
-        const internal = internals.get(this.#pkg)?.versions.obtain(this.#version);
+        const internal = internals.get(pkg)?.versions.obtain(version);
         this.#store = internal ? new VInternal(pkg, version) : new VPackage(pkg, version);
     }
 

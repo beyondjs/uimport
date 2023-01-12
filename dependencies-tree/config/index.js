@@ -7,6 +7,12 @@ module.exports = class extends Map {
         return this.#hash;
     }
 
+    setHash() {
+        const compute = {};
+        this.forEach(({version, kind}, specifier) => compute[specifier] = {version, kind});
+        this.#hash = crc32(equal.generate(compute));
+    }
+
     constructor(json) {
         super();
         json && this.#set(json);
@@ -20,14 +26,13 @@ module.exports = class extends Map {
         development && Object.entries(development).forEach(entry => process(...entry, 'development'));
         peer && Object.entries(peer).forEach(entry => process(...entry, 'peer'));
 
-        const compute = {};
-        this.forEach(({version, kind}, specifier) => compute[specifier] = {version, kind});
-        this.#hash = crc32(equal.generate(compute));
+        this.setHash();
     }
 
     hydrate(values) {
         this.clear();
         values.forEach(({key, value}) => this.set(key, value));
+        this.setHash();
     }
 
     toJSON() {

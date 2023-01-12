@@ -21,13 +21,13 @@ module.exports = async function (specifier, res) {
     await vpkg.load();
     const content = (() => {
         const json = (() => {
-            let json = vpkg.pkg.toJSON();
+            const json = Object.assign({uptodate: vpkg.pkg.uptodate}, vpkg.pkg.toJSON());
             delete json.versions;
 
             /**
              * Merge the package data with the vpackage data
              */
-            json = Object.assign(json, vpkg.toJSON());
+            const output = Object.assign(json, vpkg.toJSON());
 
             /**
              * The flat dependencies specified in the package.json (not the tree dependencies)
@@ -35,34 +35,37 @@ module.exports = async function (specifier, res) {
              * standard format
              * @type {{config?: {}}}
              */
-            json.dependencies = ((dependencies) => {
+            output.dependencies = ((dependencies) => {
                 if (!dependencies) return {};
 
                 const output = {};
-                json.dependencies?.forEach(({key, value}) => output[key] = value);
+                dependencies?.forEach(({key, value}) => output[key] = value);
                 return {config: output};
-            })(json.dependencies);
+            })(output.dependencies);
 
             /**
              * Process the exports from the stored structure (the required by firestore) to a more
              * standard format
              * @type {{}|{}}
              */
-            json.exports = ((exports) => {
+            output.exports = ((exports) => {
                 if (!exports) return {};
 
                 const output = {};
-                json.exports?.forEach(({key, value}) => output[key] = value);
+                output.exports?.forEach(({key, value}) => output[key] = value);
                 return output;
-            })(json.exports);
+            })(output.exports);
 
-            return json;
+            return output;
         })();
 
         /**
          * Set the dependencies tree
          */
-        json.dependencies.tree = dependencies.object[specifier.vpkg];
+        json.dependencies.tree = (() => {
+            const {valid, errors, object} = dependencies;
+            return valid ? object : {errors};
+        })();
         return json;
     })();
 

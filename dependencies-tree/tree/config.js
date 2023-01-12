@@ -32,9 +32,8 @@ module.exports = class extends Map {
         return this.#is;
     }
 
-    #hash;
     get hash() {
-        return this.#hash;
+        return this.#config?.hash;
     }
 
     #errors;

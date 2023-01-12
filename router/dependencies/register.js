@@ -1,4 +1,4 @@
-const {DependenciesTree} = require('@beyond-js/uimport/dependencies-tree');
+const Installer = require('@beyond-js/uimport/installer');
 
 module.exports = async function (route, res) {
     if (!route.body) {
@@ -6,11 +6,10 @@ module.exports = async function (route, res) {
         return;
     }
 
-    const dependencies = new DependenciesTree({application: route.application, json: route.body});
-    await dependencies.process({update: true});
+    const installer = new Installer({application: route.application, json: route.body});
+    await installer.process({update: true});
 
-    const {valid, errors} = dependencies;
-    const json = {};
-    valid ? (json.dependencies = dependencies.object) : (json.errors = errors);
+    const {valid, errors} = installer;
+    const json = {valid, errors};
     res.send(json).end();
 }
