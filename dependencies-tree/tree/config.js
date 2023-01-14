@@ -21,6 +21,11 @@ module.exports = class extends Map {
         return this.#version;
     }
 
+    #vpkg;
+    get vpkg() {
+        return this.#vpkg;
+    }
+
     #internals
 
     #is;
@@ -52,6 +57,7 @@ module.exports = class extends Map {
         this.#json = json;
         this.#pkg = pkg;
         this.#version = version;
+        this.#vpkg = `${pkg}@${version}`;
         this.#internals = internals;
     }
 

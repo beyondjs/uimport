@@ -2,8 +2,10 @@ const fs = require('fs').promises;
 const {join, dirname} = require('path');
 const SEPARATOR = '\n![!SEPARATOR!]!\n';
 const cwd = process.cwd();
+const md5 = require('@beyond-js/md5');
 
 module.exports = class {
+    #id;
     #dirname;
     #path;
 
@@ -14,14 +16,10 @@ module.exports = class {
 
     #initialised = false;
 
-    constructor({container, pkg, version}) {
-        if (!container || !pkg || !version) throw new Error('Invalid parameters');
-        // Actually only 'modules.create' container is expected
-        if (!['modules.create'].includes(container)) throw new Error('Action "${container}" not found');
-
-        if (container.includes('/') || container.includes('\\')) throw new Error('Invalid container specification');
-
-        this.#path = join(cwd, '.beyond/logs/packager', `${pkg}@${version}.json`);
+    constructor(id) {
+        if (!id) throw new Error('Invalid parameters');
+        this.#id = md5(id);
+        this.#path = join(cwd, '.beyond/logs', this.#id);
         this.#dirname = dirname(this.#path);
     }
 

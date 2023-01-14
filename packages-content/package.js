@@ -6,7 +6,19 @@ const File = require('./files/file');
 
 module.exports = class {
     #pkg;
+    get pkg() {
+        return this.#pkg;
+    }
+
     #version;
+    get version() {
+        return this.#version;
+    }
+
+    get vpkg() {
+        return `${this.#pkg}@${this.#version}`;
+    }
+
     #store;
 
     #found;
@@ -49,9 +61,12 @@ module.exports = class {
 
     #promise;
 
-    async process() {
+    async process(specs) {
         if (this.#promise) return await this.#promise;
         this.#promise = new PendingPromise();
+
+        specs = specs ? specs : {};
+        const {logger} = specs;
 
         await this.#store.load();
         const stored = this.#store.value?.files;
@@ -77,8 +92,11 @@ module.exports = class {
          * Download the vpackage
          */
         const downloader = new Downloader(this.#pkg, this.#version);
+        const vname = `${this.#pkg}@${this.#version}`;
+        logger?.add(`Downloading "${vname}"`)
         await downloader.process();
         const {valid, found, error, files} = downloader;
+        logger?.add(valid ? `  … Package "${vname}" download done` : ` … Couldn't download "${vname}": ${error}`);
 
         /**
          * Save the meta information to the store and

@@ -35,7 +35,7 @@ module.exports = class {
     }
 
     async fetch() {
-        const response = await fetch(`https://registry.npmjs.org/${this.#packageName}`);
+        const response = await fetch(`https://registry.npmjs.org/-/package/${this.#packageName}/dist-tags`);
 
         const {ok, status} = response;
         if (status === 404) {

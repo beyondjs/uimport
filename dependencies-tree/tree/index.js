@@ -109,7 +109,7 @@ module.exports = class extends Map {
     /**
      * Process the dependencies tree
      *
-     * @param specs {{update: boolean}}
+     * @param specs {{update: boolean, logger: *}}
      * @return {Promise<void>}
      */
     async process(specs) {
@@ -118,23 +118,35 @@ module.exports = class extends Map {
         if (this.#promise) return await this.#promise;
         this.#promise = new PendingPromise();
 
-        const done = ({errors}) => {
-            this.#errors = errors ? errors : [];
+        const done = ({error}) => {
+            this.#errors = error ? [error] : [];
+            this.log(error ? error : 'Dependencies tree is processed');
             this.#promise.resolve();
         }
 
         specs = specs ? specs : {};
+        const {logger} = specs;
+
         await this.#config.process(specs);
-        if (!this.#config.valid) return done({errors: this.#config.errors});
         const config = this.#config;
+        if (!config.valid) {
+            const errors = JSON.stringify(config.errors);
+            return done({error: `Dependencies configuration errors found: ${errors}`});
+        }
 
         if (!specs.update) {
             !this.#loaded && await this.#load();
-            if (!this.#loaded) return done({errors: [`Dependencies tree is not processed`]});
+            if (!this.#loaded) return done({error: `Dependencies tree is not processed`});
             return done({});
         }
 
         if (this.#loaded) return;
+
+        /**
+         * The already processed dependencies tree of a package, required to resolve circular dependencies
+         * @type {Map<string, Map<string, *>>}
+         */
+        const already = new Map();
 
         /**
          * Recursively find the dependencies
@@ -142,7 +154,12 @@ module.exports = class extends Map {
          * @return {Promise<Map<string, *>>}
          */
         const recursive = async dependencies => {
+            const {vpkg: vname} = dependencies;
+            if (already.has(vname)) return already.get(vname);
+
             const output = new Map();
+            already.set(vname, output);
+
             for (const [name, {kind, version}] of dependencies) {
                 if (kind === 'development') continue;
 
@@ -151,7 +168,7 @@ module.exports = class extends Map {
                 }
 
                 const dependency = new Dependency(name, version, this.#internals);
-                await dependency.process();
+                await dependency.process({logger});
                 if (dependency.error) {
                     done(({error: dependency.error}));
                     continue;

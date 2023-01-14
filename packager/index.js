@@ -7,9 +7,9 @@ const {Logger} = require('#store');
 const esm = require('./esm');
 
 module.exports = class {
-    #vspecifier;
-    get vspecifier() {
-        return this.#vspecifier;
+    #specifier;
+    get specifier() {
+        return this.#specifier;
     }
 
     #platform;
@@ -67,32 +67,32 @@ module.exports = class {
 
     /**
      * Packager constructor
-     * @param vspecifier
+     * @param specifier {SpecifierParser}
      * @param platform {string}
      */
-    constructor(vspecifier, platform) {
-        if (!(vspecifier instanceof SpecifierParser) || !platform) throw new Error('Invalid parameters');
-        if (!vspecifier.valid) throw new Error(`Specifier "${vspecifier.value}" is invalid: ${vspecifier}`);
+    constructor(specifier, platform) {
+        if (!(specifier instanceof SpecifierParser) || !platform) throw new Error('Invalid parameters');
+        if (!specifier.valid) throw new Error(`Specifier "${specifier.value}" is invalid: ${specifier}`);
 
-        this.#vspecifier = vspecifier;
+        this.#specifier = specifier;
         this.#platform = platform;
 
-        const {pkg, version} = vspecifier;
-        this.#logger = new Logger({container: 'modules.create', pkg, version});
+        const {pkg, version} = specifier;
+        this.#logger = new Logger(`modules.create:${pkg}@${version}`);
     }
 
     /**
      * Check if package and its version are found and valid
      */
     async #prepare() {
-        await this.log(`Checking that the specifier "${this.#vspecifier.value}" exists`);
+        await this.log(`Checking that the specifier "${this.#specifier.value}" exists`);
 
-        const pkg = registry.get(this.#vspecifier.pkg);
-        const vpkg = await pkg.versions.get(this.#vspecifier.version);
+        const pkg = registry.get(this.#specifier.pkg);
+        const vpkg = await pkg.versions.get(this.#specifier.version);
 
         if (!pkg.found) {
             this.#found = false;
-            const message = `Package "${this.#vspecifier.pkg}" not found`;
+            const message = `Package "${this.#specifier.pkg}" not found`;
             this.#errors = [message];
             await this.log(message);
             return;
@@ -105,7 +105,7 @@ module.exports = class {
         }
         if (!vpkg) {
             this.#found = false;
-            const message = `Version "${this.#vspecifier.version}" of package "${this.#vspecifier.pkg}" not found`;
+            const message = `Version "${this.#specifier.version}" of package "${this.#specifier.pkg}" not found`;
             this.#errors = [message];
             await this.log(message);
             return;
@@ -117,7 +117,7 @@ module.exports = class {
             return;
         }
 
-        const {subpath} = this.#vspecifier;
+        const {subpath} = this.#specifier;
         if (!vpkg.exports.has(subpath)) {
             this.#found = false;
             const exports = JSON.stringify([...vpkg.exports.keys()]);
@@ -145,7 +145,7 @@ module.exports = class {
         await this.#prepare();
         if (!this.valid) return;
 
-        const {pkg, version} = this.#vspecifier;
+        const {pkg, version} = this.#specifier;
 
         if (this.#uimport) {
             const pcontent = packages.get(pkg, version);

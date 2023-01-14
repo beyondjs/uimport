@@ -47,8 +47,8 @@ module.exports = class {
         /**
          * Check if it is a self package specifier
          */
-        if (specifier.pkg === packager.vspecifier.pkg) {
-            const {pkg, version} = packager.vspecifier;
+        if (specifier.pkg === packager.specifier.pkg) {
+            const {pkg, version} = packager.specifier;
             this.#namespace = new NameSpace({pkg, version});
             return;
         }

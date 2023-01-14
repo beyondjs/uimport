@@ -1,7 +1,11 @@
 const {entities: {Package: PackageStore}} = require('#store');
 const PackageVersions = require('./versions');
 const PackageFetcher = require('./fetcher');
+const DistTags = require('./disttags');
 const PendingPromise = require('@beyond-js/pending-promise');
+const equal = require('@beyond-js/equal');
+
+const CACHE_TIME = 1000000 * 60 * 1000;
 
 module.exports = class {
     #store;
@@ -48,9 +52,9 @@ module.exports = class {
         return this.#repository;
     }
 
-    #distTags;
-    get distTags() {
-        return this.#distTags;
+    #disttags;
+    get disttags() {
+        return this.#disttags;
     }
 
     #versions;
@@ -85,7 +89,7 @@ module.exports = class {
         this.#homepage = values.homepage;
         this.#license = values.license;
         this.#repository = values.repository;
-        this.#distTags = values.distTags;
+        this.#disttags = values.disttags ? values.disttags : values['dist-tags'];
         this.#fetchedTime = values.fetchedTime;
     }
 
@@ -98,8 +102,8 @@ module.exports = class {
             return json;
         }
 
-        const {name, description, homepage, license, repository, distTags, fetchedTime, versions} = this;
-        const json = {found, name, description, homepage, license, repository, distTags, fetchedTime};
+        const {name, description, homepage, license, repository, disttags, fetchedTime, versions} = this;
+        const json = {found, name, description, homepage, license, repository, disttags, fetchedTime};
         json.versions = versions.toJSON();
         return json;
     }
@@ -127,11 +131,13 @@ module.exports = class {
      * sets the package's properties, and since the NPM registry returns the versions data,
      * sets it to the versions object to save them all.
      *
-     * @param specs {{fetch: boolean}} If property fetch is true, fetch the package if not previously fetched or outdated
+     * @param specs {{fetch: boolean, logger: *}} If property fetch is true, fetch the package
+     * if not previously fetched or outdated
      * @return {Promise<void>}
      */
     async load(specs) {
         specs = specs ? specs : {};
+        const {logger} = specs;
 
         if (this.#promise) return await this.#promise;
         this.#promise = new PendingPromise();
@@ -154,16 +160,36 @@ module.exports = class {
              * Check if package registry information is outdated
              */
             const {fetchedTime} = this.#store.value;
-            const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+            const fiveMinutesAgo = Date.now() - CACHE_TIME;
             const uptodate = fetchedTime && fetchedTime > fiveMinutesAgo;
 
             this.#hydrate(this.#store.value);
 
             if (uptodate) {
+                specs.fetch && logger?.add(`"${this.#name}" is up-to-date`);
                 return done({loaded: true, uptodate: true});
             }
             else if (!specs.fetch) {
                 return done({loaded: true, uptodate: false});
+            }
+            else {
+                logger?.add(`Checking if "${this.#name}" is up-to-date`);
+                const disttags = new DistTags(this.#name);
+                await disttags.fetch();
+                const {valid, error, found, data} = disttags;
+
+                if (!valid || !found) {
+                    const message = `  … Error while checking if "${this.#name}" is up-to-date: ` +
+                        (!found ? 'not found' : error);
+                    logger?.add(message);
+                }
+                else if (equal(this.#disttags, data)) {
+                    logger?.add(`  … "${this.#name}" is up-to-date`);
+
+                    const fetchedTime = Date.now();
+                    await this.#store.set(Object.assign({fetchedTime}));
+                    return done({loaded: true, uptodate: true});
+                }
             }
         }
         if (!specs.fetch) return done({loaded: false, uptodate: false});
@@ -173,8 +199,10 @@ module.exports = class {
         /**
          * As the package data is not in the store, then fetch it
          */
+        logger?.add(`Fetching package "${this.#name}"`);
         const fetcher = new PackageFetcher(this.#name);
         await fetcher.fetch();
+        logger?.add(`  … package "${this.#name}" fetched`);
 
         const {valid, error, found, data} = fetcher;
         if (valid) {
@@ -200,7 +228,6 @@ module.exports = class {
          */
         const json = this.toJSON();
         await this.#store.set(Object.assign({fetchedTime}, json));
-
         done({loaded: true});
     }
 }

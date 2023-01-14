@@ -33,7 +33,7 @@ module.exports = class {
         this.#internals = internals;
     }
 
-    async process() {
+    async process({logger}) {
         /**
          * Check if it is an dependency of an internal package
          */
@@ -64,7 +64,7 @@ module.exports = class {
         const {declared} = this.#version;
 
         const pkg = packages.get(this.#pkg);
-        pkg.load({fetch: true});
+        await pkg.load({fetch: true, logger});
 
         const vpackage = await packages.get(this.#pkg).versions.get(declared);
         if (vpackage?.valid) {

@@ -54,7 +54,7 @@ module.exports = class {
 
     async #load(args) {
         if (args.namespace === 'beyond:entry-point') {
-            const specifier = this.#packager.vspecifier.specifier;
+            const specifier = this.#packager.specifier.specifier;
             let contents = `export * from '${specifier}';`;
 
             contents += '\n\n' +
@@ -88,14 +88,20 @@ module.exports = class {
 
             return packages.get(name, version);
         })();
-        if (!vpkg.found) return;
+        await vpkg.process();
+        if (!vpkg.found) {
+            await this.log(`Package content "${vpkg.vpkg}" not found`);
+            return;
+        }
 
-        const file = (() => {
+        const {file, filename} = (() => {
             const f = sep !== '/' ? path.replace(/\\/g, '/') : path;
-            return vpkg.files.get(f.slice(2)); // Remove the './' at the beginning of the path
+            const filename = f.slice(2); // Remove the './' at the beginning of the path
+            const file = vpkg.files.get(filename);
+            return {file, filename};
         })();
         if (!file) {
-            await this.log(`File "${file}" on "${namespace}" not found`);
+            await this.log(`File "${filename}" on "${namespace}" not found`);
             return;
         }
 

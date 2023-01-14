@@ -84,7 +84,7 @@ module.exports = class {
          * The entry point
          */
         if (args.namespace === 'beyond:entry-point') {
-            const {pkg, version, subpath} = this.#plugin.packager.vspecifier;
+            const {pkg, version, subpath} = this.#plugin.packager.specifier;
             const vpkg = await packages.get(pkg).versions.get(version);
             if (!vpkg.exports.has(subpath)) return;
 
