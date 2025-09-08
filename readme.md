@@ -4,7 +4,7 @@
 
 Import them in any ESM environment (browser, Node.js v14+, Deno, etc).
 
-![Consuming react as a local package](./readme/example.png "Consuming react as a local package").
+![Consuming react as a local package](./readme/example.png 'Consuming react as a local package').
 
 # How it works
 
@@ -12,21 +12,23 @@ Import them in any ESM environment (browser, Node.js v14+, Deno, etc).
 npm install -g uimport
 ```
 
-* UImport uses [esbuild](https://esbuild.github.io/api/#build-api) to generate the pre-packaged version of the bundle,
-  and to obtain the metafile information of the package/subpath required to analyze the dependencies, esbuild is written
-  in Go and it performs 10-100x faster than other bundlers written in javascript.
+-   UImport uses [esbuild](https://esbuild.github.io/api/#build-api) to generate the pre-packaged version of the bundle,
+    and to obtain the metafile information of the package/subpath required to analyze the dependencies, esbuild is
+    written in Go and it performs 10-100x faster than other bundlers written in javascript.
 
-* UImport does not install the packages, but instead requires the packages to be installed in the working directory
-  before calling it.
+-   UImport does not install the packages, but instead requires the packages to be installed in the working directory
+    before calling it.
 
 ## Bundles
 
 We define as `bundles` to the ES modules generated from the packages or the subpaths of the packages.
 
 By instance
+
 > `react` is a package that does not define subpaths, so react is a bundle.
 >
-> `svelte` is a package that does define subpaths, so `svelte/internal` or `svelte/store` are bundles of the same svelte package.
+> `svelte` is a package that does define subpaths, so `svelte/internal` or `svelte/store` are bundles of the same svelte
+> package.
 
 ## Subpaths
 
@@ -38,7 +40,7 @@ units of code.
 // The following two EM modules belong to the same package (svelte)
 import 'svelte/internal';
 import 'svelte/store';
-````
+```
 
 When uimport generates a bundle, and finds a dependency on a subpath of a package that does not specify the .exports
 property, then uimport will not split the code, but rather include the code in the requested bundle.
@@ -62,7 +64,7 @@ uimport server --port=8080 --cwd=working_directory
 ```javascript
 import 'http://localhost:port/package_name.js';
 import 'http://localhost:port/package_name/subpath.js';
-````
+```
 
 #### Load the exact version of the package
 
@@ -88,31 +90,31 @@ working directory where node_modules resides.
 ```javascript
 const uimport = require('uimport');
 const bundle = 'react';
-const {code, errors, warnings, dependencies} = await uimport(bundle);
+const { code, errors, warnings, dependencies } = await uimport(bundle);
 ```
 
 ```javascript
 // mode can be 'esm', 'sjs', or 'amd'
-const {code, errors, warnings, dependencies} = await uimport(bundle, mode, specs);
+const { code, errors, warnings, dependencies } = await uimport(bundle, mode, specs);
 ```
 
-* specs:
+-   specs:
 
 ```typescript
 interface specs {
-    cwd?: string,   // The working directory where the local NPM modules are installed
-    temp?: string,  // A required folder to save temporary files. Default: join(cwd, '.uimport/temp')
-    cache?: string, // Bundles are saved in cache. Default: join(cwd, '.uimport/cache');
-    dependencies?: boolean // Build the dependencies of the bundle or not
+	cwd?: string; // The working directory where the local NPM modules are installed
+	temp?: string; // A required folder to save temporary files. Default: join(cwd, '.uimport/temp')
+	cache?: string; // Bundles are saved in cache. Default: join(cwd, '.uimport/cache');
+	dependencies?: boolean; // Build the dependencies of the bundle or not
 }
 ```
 
 ```typescript
 interface output {
-    code: string,
-    errors?: string[],
-    warnings?: string[],
-    dependencies?: string[]
+	code: string;
+	errors?: string[];
+	warnings?: string[];
+	dependencies?: string[];
 }
 ```
 
@@ -133,26 +135,26 @@ Package.json example:
 
 ```json5
 {
-  "name": "your-package",
-  "uimport": {
-    "bundles": {
-      "./store": "./store/index.js"
-    }
-  }
+	name: 'your-package',
+	uimport: {
+		bundles: {
+			'./store': './store/index.js'
+		}
+	}
 }
 ```
 
 ```typescript
 interface uimport {
-    bundles: Record<string, string>,
-    assets: Record<string, string>
+	bundles: Record<string, string>;
+	assets: Record<string, string>;
 }
 ```
 
 Where:
 
-* `.bundles` Specifies the ES module to be returned for each entry point.
-* `.assets` Similar to the .bundles property, but defining general purpose files such as images.
+-   `.bundles` Specifies the ES module to be returned for each entry point.
+-   `.assets` Similar to the .bundles property, but defining general purpose files such as images.
 
 # About uimport
 
@@ -175,7 +177,7 @@ in each project.
 
 # Feedback and collaboration
 
-* If you know of an alternative solution to `uimport`, please let us know.
-* If `uimport` is useful to you, maybe you can collaborate with us to join efforts.
+-   If you know of an alternative solution to `uimport`, please let us know.
+-   If `uimport` is useful to you, maybe you can collaborate with us to join efforts.
 
-> [hello@beyondjs.com](mailto:hello@beyondjs.com). 
+> [hello@beyondjs.com](mailto:hello@beyondjs.com).
