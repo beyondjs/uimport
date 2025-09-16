@@ -3,7 +3,7 @@ name: Publish to NPM
 on:
     push:
         branches:
-            - deploy/main # Change this to the branch you want to trigger the publish
+            - deploy/npm # Change this to the branch you want to trigger the publish
 
 jobs:
     build-and-publish:
